@@ -53,7 +53,7 @@ const Input: React.FC<InputProps> = ({
             className="absolute inset-y-0 right-0 flex items-center pr-2.5 cursor-pointer text-primary-500"
             onClick={togglePasswordVisibility}
           >
-            <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+            <i className={`bi ${showPassword ? "bi-eye" : "bi-eye-slash"}`}></i>
           </span>
         )}
       </div>
