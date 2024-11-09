@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import Input from '../common/Input';
-import Button from '../common/Button';
+import Input from "../common/Input";
+import Button from "../common/Button";
 
 const ForgotPasswordForm: React.FC = () => {
   return (
     <form className="flex flex-col justify-center items-center gap-y-2.5">
-        {/* Email field */}
+      {/* Email field */}
       <div className="w-full mb-5">
         <Input
           label="Email"
@@ -18,13 +18,21 @@ const ForgotPasswordForm: React.FC = () => {
         />
       </div>
 
+      {/* Continue button */}
       <div className="w-full mb-5">
-        <Button variant='primary'>Tiếp tục</Button>
+        <Button variant="primary">Tiếp tục</Button>
       </div>
 
-      <Button variant='secondary-link' alignment='center' icon='bi-chevron-left'>Quay lại</Button>
+      {/* Back button */}
+      <Button
+        variant="secondary-link"
+        alignment="center"
+        icon="bi-chevron-left"
+      >
+        Quay lại
+      </Button>
     </form>
-  )
-}
+  );
+};
 
-export default ForgotPasswordForm
+export default ForgotPasswordForm;
