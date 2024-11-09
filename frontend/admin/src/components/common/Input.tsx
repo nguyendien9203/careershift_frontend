@@ -44,9 +44,9 @@ const Input: React.FC<InputProps> = ({
         <input
           {...props}
           type={type === "password" && showPassword ? "text" : type}
-          className={`border border-secondary-100 rounded-[5px] w-full py-2.5 pr-2.5 text-black leading-tight focus:outline-none h-10 ${
+          className={`border border-secondary-100 rounded-[5px] w-full py-2.5 pr-2.5 text-black leading-tight focus:outline-none focus:border-primary-500 h-10 ${
             icon ? "pl-9" : "pl-2.5"
-          } ${type !== "password" ? "px-2.5" : ""}`}
+          } ${type !== "password" ? "px-2.5" : ""} ${props.className}`}
         />
         {showPasswordToggle && type === "password" && (
           <span

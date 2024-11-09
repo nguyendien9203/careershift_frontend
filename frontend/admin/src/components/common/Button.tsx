@@ -60,7 +60,7 @@ const Button: React.FC<ButtonProps> = ({
 
   if (variant.includes('-link')) {
     return (
-        <a className={`${baseStyle} ${alignmentStyle} ${variantLinkStyle}`} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+        <a className={`${baseStyle} ${alignmentStyle} ${variantLinkStyle} ${props.className}`} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
             {renderIcon(icon)}
             {children}
         </a>
@@ -68,7 +68,7 @@ const Button: React.FC<ButtonProps> = ({
   }
 
   return (
-    <button className={`${baseStyle} ${alignmentStyle} ${variantButtonStyle}`} {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
+    <button className={`${baseStyle} ${alignmentStyle} ${variantButtonStyle} ${props.className}`} {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
         {renderIcon(icon)}
         {children}
     </button>
