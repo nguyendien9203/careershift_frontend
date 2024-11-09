@@ -14,13 +14,13 @@ const Button: React.FC<ButtonProps> = ({ variant = 'primary', icon, alignment = 
       ? 'w-full h-10 p-2.5 rounded-[5px] bg-primary-500 text-white hover:bg-primary-600'
     : variant === 'light'
       ? 'w-full h-10 p-2.5 rounded-[5px] bg-white text-black border border-secondary-100 hover:bg-slate-100'
-      : 'bg-transparent mt-2.5 text-secondary-700 border-none hover:underline';
+      : 'bg-transparent text-secondary-700 border-none hover:underline';
 
     const alignmentStyle = alignment === 'center' ? 'justify-center' : alignment === 'start' ? 'justify-start' : 'justify-end';
   return (
     <button className={`${baseStyle} ${alignmentStyle} ${variantStyle}`} {...props}>
         {icon && (
-            <span className="mr-2.5 w-5 h-5 flex items-center justify-center">
+            <span className="mr-[5px] w-5 h-5 flex items-center justify-center">
                 {typeof icon === 'string' ? (
                     <i className={`bi ${icon}`}></i>
                 ) : (

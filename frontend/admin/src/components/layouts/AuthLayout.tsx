@@ -22,7 +22,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
             {/* Logo Section */}
             <div className='flex flex-col items-center p-2.5 gap-y-2.5'>
                 {isBootstrapIcon ? (
-                    <span className='flex items-center justify-center w-10 h-10 p-2.5 border border-secondary-100 rounded-[5px]'>
+                    <span className='flex items-center justify-center w-10 h-10 p-2.5 border border-secondary-100 rounded-[5px] text-primary-500'>
                         <i className={`bi ${logo} text-xl`} aria-hidden="true"></i>
                     </span>
                 ) : (

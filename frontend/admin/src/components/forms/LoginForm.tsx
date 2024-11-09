@@ -31,7 +31,7 @@ const LoginForm: React.FC = () => {
         />
       </div>
 
-      <div className="w-full mb-5">
+      <div className="w-full mb-5 flex flex-col gap-y-2.5">
         {/* Password field */}
         <Input
           label="Mật Khẩu"
