@@ -13,6 +13,7 @@ module.exports = {
         },
         secondary: {
           100: '#D8D9DB',
+          600: '#888C93',
           700: '#6C7079',
         },
       },

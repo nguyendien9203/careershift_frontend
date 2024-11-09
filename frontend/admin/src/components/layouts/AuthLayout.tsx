@@ -17,7 +17,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 
   return (
     <div className='flex items-center justify-center px-4 sm:px-6 lg:px-8'>
-        <div className='flex justify-center items-center flex-col gap-y-2.5 sm:max-w-[480px] w-full p-5 mt-8 sm:mt-[100px]'>
+        <div className='flex justify-center items-center flex-col gap-y-2.5 sm:max-w-[480px] w-full p-5 mt-8 sm:mt-[50px]'>
 
             {/* Logo Section */}
             <div className='flex flex-col items-center p-2.5 gap-y-2.5'>

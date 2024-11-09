@@ -22,7 +22,7 @@ const ForgotPasswordForm: React.FC = () => {
         <Button variant='primary'>Tiếp tục</Button>
       </div>
 
-      <Button variant='no-boder' alignment='center' icon='bi-chevron-left'>Quay lại</Button>
+      <Button variant='secondary-link' alignment='center' icon='bi-chevron-left'>Quay lại</Button>
     </form>
   )
 }

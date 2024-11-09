@@ -44,7 +44,7 @@ const LoginForm: React.FC = () => {
         />
 
         {/* Forgot password link */}
-        <Button variant="no-boder" alignment="start">
+        <Button variant="secondary-link" alignment="start">
           Quên mật khẩu?
         </Button>
       </div>
