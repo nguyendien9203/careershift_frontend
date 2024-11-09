@@ -44,14 +44,9 @@ const LoginForm: React.FC = () => {
         />
 
         {/* Forgot password link */}
-        <div className="w-full flex mt-2.5">
-          <a
-            href="/forgot-password"
-            className="text-secondary-700 text-base hover:underline"
-          >
-            Quên mật khẩu?
-          </a>
-        </div>
+        <Button variant="no-boder" alignment="start">
+          Quên mật khẩu?
+        </Button>
       </div>
 
       {/* Login button */}
