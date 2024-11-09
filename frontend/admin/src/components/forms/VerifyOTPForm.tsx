@@ -7,13 +7,13 @@ const VerifyOTPForm: React.FC = () => {
   return (
     <form className="flex flex-col justify-center items-center gap-y-2.5">
       {/* Otp field */}
-      <div className="w-full mb-5 flex justify-between">
-        <Input type="text" id="otp1" className="w-[40px] text-center" />
-        <Input type="text" id="otp2" className="w-[40px] text-center" />
-        <Input type="text" id="otp3" className="w-[40px] text-center" />
-        <Input type="text" id="otp4" className="w-[40px] text-center" />
-        <Input type="text" id="otp5" className="w-[40px] text-center" />
-        <Input type="text" id="otp6" className="w-[40px] text-center" />
+      <div className="w-full mb-5 flex justify-between gap-2.5">
+        <Input type="text" id="otp1" className="text-center" />
+        <Input type="text" id="otp2" className="text-center" />
+        <Input type="text" id="otp3" className="text-center" />
+        <Input type="text" id="otp4" className="text-center" />
+        <Input type="text" id="otp5" className="text-center" />
+        <Input type="text" id="otp6" className="text-center" />
       </div>
 
       {/* Continue button */}
