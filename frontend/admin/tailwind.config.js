@@ -16,6 +16,12 @@ module.exports = {
           600: '#888C93',
           700: '#6C7079',
         },
+        success: {
+          500: '#22c55e',
+        },
+        danger: {
+          500: '#ef4444',
+        },
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],

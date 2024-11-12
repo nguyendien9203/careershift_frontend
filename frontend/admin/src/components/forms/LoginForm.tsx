@@ -1,12 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
 
+import { useNotifications } from "../../contexts/NotificationContext";
+import { login } from "../../services/authService";
 import Button from "../common/Button";
 import Input from "../common/Input";
 
 const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { message } = useNotifications();
+
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      message.error("Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
+
+    setLoading(true);
+
+    login(email, password)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 403) {
+          message.info(res.message);
+          navigate(`/verify-otp?email=${email}&purpose=ACCOUNT_VERIFICATION`);
+        } else if (res.status === 200) {
+          message.success(res.message);
+          navigate("/");
+        }
+      })
+      .catch((error: any) => {
+        setLoading(false);
+        message.error(error.message || "Đăng nhập thất bạn, vui lòng thử lại.");
+      });
+  };
+
+  const handleForgotPasword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
-    <form className="flex flex-col justify-center items-center gap-y-2.5">
+    <form
+      className="flex flex-col justify-center items-center gap-y-2.5"
+      onSubmit={handleSubmit}
+    >
       {/* Login with Google button */}
       <Button variant="light" icon={FcGoogle}>
         Đăng nhập với Google
@@ -28,6 +72,13 @@ const LoginForm: React.FC = () => {
           id="email"
           icon="bi-envelope"
           layout="vertical"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          validate={(value) => {
+            if (!value) return "Email không được để trống";
+            if (!/\S+@\S+\.\S+/.test(value)) return "Email không hợp lệ";
+            return null;
+          }}
         />
       </div>
 
@@ -41,16 +92,33 @@ const LoginForm: React.FC = () => {
           icon="bi-shield-lock"
           showPasswordToggle={true}
           layout="vertical"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          validate={(value) => {
+            if (!value) return "Mật khẩu không được để trống";
+            return null;
+          }}
         />
 
         {/* Forgot password link */}
-        <Button variant="secondary-link" alignment="start">
+        <Button
+          variant="secondary-link"
+          alignment="start"
+          onClick={handleForgotPasword}
+        >
           Quên mật khẩu?
         </Button>
       </div>
 
       {/* Login button */}
-      <Button variant="primary">Đăng Nhập</Button>
+      <Button
+        variant="primary"
+        type="submit"
+        loading={loading}
+        disabled={loading}
+      >
+        Đăng Nhập
+      </Button>
     </form>
   );
 };
