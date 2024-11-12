@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useNotifications } from "../../contexts/NotificationContext";
 import {
   verifyAccountOtp,
+  verifyPasswordResetOtp,
   resendOtpIfNeeded,
 } from "../../services/authService";
 import Input from "../common/Input";
@@ -16,6 +17,8 @@ const VerifyOTPForm: React.FC = () => {
   const { email = "", purpose = "" } = Object.fromEntries(
     new URLSearchParams(search)
   );
+
+  console.log(purpose);
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,7 +53,7 @@ const VerifyOTPForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.some((digit) => digit === "")) {
-      message.error("Vui lòng nhập đầy đủ mã OTP.");
+      message.error("Vui lòng nhập đầy đủ mã OTP");
       return;
     }
 
@@ -58,18 +61,33 @@ const VerifyOTPForm: React.FC = () => {
 
     const otpString = otp.join("");
 
-    verifyAccountOtp(email, otpString)
-      .then((res) => {
-        setLoading(false);
-        if (res.status === 200) {
-          message.success(res.message);
-          navigate("/");
-        }
-      })
-      .catch((error: any) => {
-        setLoading(false);
-        message.error(error.message || "Xác minh thất bại.");
-      });
+    if (purpose === "ACOUNT_VERIFICATION") {
+      verifyAccountOtp(email, otpString)
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200) {
+            message.success(res.message);
+            navigate("/");
+          }
+        })
+        .catch((error: any) => {
+          setLoading(false);
+          message.error(error.message || "Xác minh thất bại");
+        });
+    } else {
+      verifyPasswordResetOtp(email, otpString)
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200) {
+            message.success(res.message);
+            navigate(`/reset-password?email=${email}`);
+          }
+        })
+        .catch((error: any) => {
+          setLoading(false);
+          message.error(error.message || "Xác minh thất bại");
+        });
+    }
   };
 
   const handleResentOtp = () => {
@@ -82,7 +100,7 @@ const VerifyOTPForm: React.FC = () => {
       })
       .catch((error) => {
         setIsResendingOtp(false);
-        message.error(error.message || "Gửi lại mã OTP thất bại.");
+        message.error(error.message || "Gửi lại mã OTP thất bại");
       });
   };
 
@@ -108,6 +126,7 @@ const VerifyOTPForm: React.FC = () => {
             maxLength={1}
             onChange={(e) => handleOtpChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
+            autoComplete="off"
           />
         ))}
       </div>

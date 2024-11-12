@@ -18,10 +18,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = ({
   variant = "primary",
-  icon,
+  icon: Icon,
   alignment = "center",
   children,
   loading = false,
+  disabled = false,
   ...props
 }) => {
   const baseStyle = "flex items-center font-normal font-base focus:ouline-none";
@@ -51,48 +52,29 @@ const Button: React.FC<ButtonProps> = ({
       : `text-black ${commonLinkStyle}`;
 
   // Spinner color depends on variant
-  const getSpinColor = () => {
-    if (variant === "primary" || variant === "secondary") {
-      return "white";
-    } else if (variant === "light" || variant === "light-link" || variant === "primary-link" || variant === "secondary-link") {
-      return "black";
-    } else {
-      return "currentColor";
-    }
-  };
+  const getSpinColor = () => (variant === "primary" || variant === "secondary" ? "white" : "black");
 
-  const renderIcon = (icon?: string | IconType) => {
-    icon && (
-      <span className="mr-[5px] w-5 h-5 flex items-center justify-center">
-        {typeof icon === "string" ? (
-          <i className={`bi ${icon}`}></i>
-        ) : (
-          React.createElement(icon, { size: 20, color: "currentColor" })
-        )}
-      </span>
-    );
-  };
-
-  const renderContent = () => {
-    if (loading) {
-      const spinColor = getSpinColor();
-      return <Spin color={spinColor} />;
-    }
-
-    return (
-      <>
-        {renderIcon()}
-        {children}
-      </>
-    );
-  };
+  const renderIcon = Icon ? (
+    <span className="mr-[5px] w-5 h-5 flex items-center justify-center">
+      {typeof Icon === "string" ? (
+        <i className={`bi ${Icon}`}></i>
+      ) : (
+        React.createElement(Icon, { size: 20, color: "currentColor" })
+      )}
+    </span>
+  ) : null;
+  
+  // Render content based on loading state
+  const renderContent = () => (loading ? <Spin color={getSpinColor()} /> : <>{renderIcon}{children}</>);
 
   const disabledStyles = loading ? "cursor-not-allowed opacity-50" : "";
+
+  const isDisabled = loading || disabled;
 
   if (variant.includes("-link")) {
     return (
       <a
-        className={`${baseStyle} ${alignmentStyle} ${variantLinkStyle} ${props.className}`}
+        className={`${baseStyle} ${alignmentStyle} ${variantLinkStyle} ${disabledStyles} ${props.className || ""}`}
         {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
       >
         {renderContent()}
@@ -102,7 +84,8 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      className={`${baseStyle} ${alignmentStyle} ${variantButtonStyle} ${disabledStyles} ${props.className}`}
+      className={`${baseStyle} ${alignmentStyle} ${variantButtonStyle} ${disabledStyles} ${props.className || ""}`}
+      disabled={isDisabled}
       {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
     >
       {renderContent()}
