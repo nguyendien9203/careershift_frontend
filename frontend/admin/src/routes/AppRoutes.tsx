@@ -5,6 +5,7 @@ import LoginPage from '../components/pages/auth/LoginPage';
 import ForgotPasswordPage from '../components/pages/auth/ForgotPasswordPage';
 import VerifyOTPPage from '../components/pages/auth/VerifyOTPPage';
 import ResetPasswordPage from '../components/pages/auth/ResetPasswordPage';
+import DashboardPage from '../components/pages/dashboard/DashboardPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -15,6 +16,9 @@ const AppRoutes: React.FC = () => {
             <Route path='/forgot-password' element={<ForgotPasswordPage />} />
             <Route path='/verify-otp' element={<VerifyOTPPage />} />
             <Route path='/reset-password' element={<ResetPasswordPage />} />
+
+            {/* Private routes */}
+            <Route path='/' element={<DashboardPage />} />
         </Routes>
     </Router>
   )
