@@ -23,6 +23,12 @@ const LoginForm: React.FC = () => {
       return;
     }
 
+    const emailError = validateField('email', email); 
+    if (emailError) {
+      message.error(emailError);
+      return;
+    }
+
     setLoading(true);
 
     login(email, password)
@@ -34,13 +40,29 @@ const LoginForm: React.FC = () => {
         } else if (res.status === 200) {
           message.success(res.message);
           navigate("/");
+        } else {
+          message.error(res.message);
         }
       })
       .catch((error: any) => {
         setLoading(false);
-        message.error(error.message || "Đăng nhập thất bạn, vui lòng thử lại.");
+        message.error(error.message || "Đăng nhập thất bạn, vui lòng thử lại");
       });
   };
+
+  const validateField = (field: string, value: string) => {
+    switch (field) {
+      case 'email':
+        if (!value) return "Email không được để trống";
+        if (!/\S+@\S+\.\S+/.test(value)) return "Email không hợp lệ";
+        return null;
+      case 'password':
+        if (!value) return "Mật khẩu không được để trống";
+        return null;
+      default:
+        return null;
+    }
+  };  
 
   const handleForgotPasword = () => {
     navigate("/forgot-password");
@@ -74,11 +96,7 @@ const LoginForm: React.FC = () => {
           layout="vertical"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          validate={(value) => {
-            if (!value) return "Email không được để trống";
-            if (!/\S+@\S+\.\S+/.test(value)) return "Email không hợp lệ";
-            return null;
-          }}
+          validate={(value) => validateField('email', value)} 
         />
       </div>
 
@@ -94,10 +112,7 @@ const LoginForm: React.FC = () => {
           layout="vertical"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          validate={(value) => {
-            if (!value) return "Mật khẩu không được để trống";
-            return null;
-          }}
+          validate={(value) => validateField('password', value)}
         />
 
         {/* Forgot password link */}
