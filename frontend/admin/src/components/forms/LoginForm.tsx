@@ -1,15 +1,15 @@
 import React, { useState } from "react";
+import { message } from "antd";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 
-import { useNotifications } from "../../contexts/NotificationContext";
-import { login } from "../../services/authService";
+import { useAuth } from "../../contexts/AuthContext";
 import Button from "../common/Button";
 import Input from "../common/Input";
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
-  const { message } = useNotifications();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -19,7 +19,7 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     if (!email || !password) {
-      message.error("Vui lòng nhập đầy đủ thông tin.");
+      message.error("Vui lòng nhập đầy đủ thông tin");
       return;
     }
 
@@ -70,7 +70,7 @@ const LoginForm: React.FC = () => {
 
   return (
     <form
-      className="flex flex-col justify-center items-center gap-y-2.5"
+      className="flex flex-col justify-center items-center gap-y-2"
       onSubmit={handleSubmit}
     >
       {/* Login with Google button */}
@@ -79,14 +79,14 @@ const LoginForm: React.FC = () => {
       </Button>
 
       {/* Divide */}
-      <div className="flex items-center my-5 w-full">
+      <div className="flex items-center my-3 w-full">
         <div className="border-t border-secondary-100 flex-grow"></div>
-        <span className="px-2.5 text-secondary-700">Hoặc</span>
+        <span className="px-2 text-secondary-700">Hoặc</span>
         <div className="border-t border-secondary-100 flex-grow"></div>
       </div>
 
       {/* Email field */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Input
           label="Email"
           type="email"
@@ -100,7 +100,7 @@ const LoginForm: React.FC = () => {
         />
       </div>
 
-      <div className="w-full mb-5 flex flex-col gap-y-2.5">
+      <div className="w-full mb-3 flex flex-col gap-y-2">
         {/* Password field */}
         <Input
           label="Mật Khẩu"

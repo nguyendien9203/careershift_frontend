@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 
-import { useNotifications } from "../../contexts/NotificationContext";
 import { forgotPassword } from "../../services/authService";
 import Input from "../common/Input";
 import Button from "../common/Button";
 
 const ForgotPasswordForm: React.FC = () => {
   const navigate = useNavigate();
-  const { message } = useNotifications();
 
   const [email, setEmail] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,11 +54,11 @@ const ForgotPasswordForm: React.FC = () => {
 
   return (
     <form
-      className="flex flex-col justify-center items-center gap-y-2.5"
+      className="flex flex-col justify-center items-center gap-y-2"
       onSubmit={handleSubmit}
     >
       {/* Email field */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Input
           label="Email"
           type="email"
@@ -74,7 +73,7 @@ const ForgotPasswordForm: React.FC = () => {
       </div>
 
       {/* Continue button */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Button
           variant="primary"
           type="submit"
