@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { message } from "antd";
 
-import { useNotifications } from "../../contexts/NotificationContext";
+import { useAuth } from "../../contexts/AuthContext";
 import {
-  verifyAccountOtp,
   verifyPasswordResetOtp,
   resendOtpIfNeeded,
 } from "../../services/authService";
@@ -11,14 +11,12 @@ import Input from "../common/Input";
 import Button from "../common/Button";
 
 const VerifyOTPForm: React.FC = () => {
-  const { message } = useNotifications();
   const navigate = useNavigate();
+  const { verifyAccountOtp } = useAuth();
   const { search } = useLocation();
   const { email = "", purpose = "" } = Object.fromEntries(
     new URLSearchParams(search)
   );
-
-  console.log(purpose);
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [loading, setLoading] = useState<boolean>(false);
@@ -61,7 +59,7 @@ const VerifyOTPForm: React.FC = () => {
 
     const otpString = otp.join("");
 
-    if (purpose === "ACOUNT_VERIFICATION") {
+    if (purpose === "ACCOUNT_VERIFICATION") {
       verifyAccountOtp(email, otpString)
         .then((res) => {
           setLoading(false);
@@ -110,7 +108,7 @@ const VerifyOTPForm: React.FC = () => {
 
   return (
     <form
-      className="flex flex-col justify-center items-center gap-y-2.5"
+      className="flex flex-col justify-center items-center gap-y-2"
       onSubmit={handleSubmit}
     >
       {/* Otp field */}
@@ -132,7 +130,7 @@ const VerifyOTPForm: React.FC = () => {
       </div>
 
       {/* Continue button */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Button
           variant="primary"
           type="submit"
@@ -144,7 +142,7 @@ const VerifyOTPForm: React.FC = () => {
       </div>
 
       {/* Resend otp button */}
-      <div className="w-full mb-5 flex gap-x-[5px] justify-center">
+      <div className="w-full mb-3 flex gap-x-[5px] justify-center">
         <span className="text-secondary-700">Không nhận được mã?</span>
         <Button
           variant="primary-link"

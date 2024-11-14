@@ -25,14 +25,14 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   ...props
 }) => {
-  const baseStyle = "flex items-center font-normal font-base focus:ouline-none";
+  const baseStyle = "flex items-center font-normal focus:ouline-none";
   const alignmentStyle =
     alignment === "center"
       ? "justify-center"
       : alignment === "start"
       ? "justify-start"
       : "justify-end";
-  const commonButtonStyle = "w-full h-10 p-2.5 rounded-[5px]";
+  const commonButtonStyle = "w-full h-8 p-2 rounded-[5px]";
   const commonLinkStyle = "cursor-pointer hover:underline text-sm";
 
   // Define style for button
@@ -55,11 +55,11 @@ const Button: React.FC<ButtonProps> = ({
   const getSpinColor = () => (variant === "primary" || variant === "secondary" ? "white" : "black");
 
   const renderIcon = Icon ? (
-    <span className="mr-[5px] w-5 h-5 flex items-center justify-center">
+    <span className="mr-[3px] flex items-center text-xs justify-center">
       {typeof Icon === "string" ? (
         <i className={`bi ${Icon}`}></i>
       ) : (
-        React.createElement(Icon, { size: 20, color: "currentColor" })
+        React.createElement(Icon, { size: 14, color: "currentColor" })
       )}
     </span>
   ) : null;

@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { message } from "antd";
 
-import { useNotifications } from "../../contexts/NotificationContext";
 import { resetPassword } from "../../services/authService";
 import Input from "../common/Input";
 import Button from "../common/Button";
 
 const ResetPasswordForm: React.FC = () => {
   const navigate = useNavigate();
-  const { message } = useNotifications();
   const { search } = useLocation();
 
   const email = new URLSearchParams(search).get("email") ?? "";
@@ -63,16 +62,16 @@ const ResetPasswordForm: React.FC = () => {
   };  
 
   const handleBack = () => {
-    navigate("/login");
+    navigate("/verify-otp");
   };
 
   return (
     <form
-      className="flex flex-col justify-center items-center gap-y-2.5"
+      className="flex flex-col justify-center items-center gap-y-2"
       onSubmit={handleSubmit}
     >
       {/* Password field */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Input
           label="Mật Khẩu"
           type="password"
@@ -88,7 +87,7 @@ const ResetPasswordForm: React.FC = () => {
       </div>
 
       {/* New password field */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Input
           label="Xác nhận mật khẩu"
           type="password"
@@ -104,7 +103,7 @@ const ResetPasswordForm: React.FC = () => {
       </div>
 
       {/* Confirm button */}
-      <div className="w-full mb-5">
+      <div className="w-full mb-3">
         <Button
           variant="primary"
           type="submit"
