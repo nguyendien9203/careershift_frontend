@@ -1,21 +1,16 @@
 "use client";
 
 import React from "react";
-import { Sidebar } from "@components/ui/sidebar";
-import { SidebarContent, SidebarHeader } from "./ui/sidebar";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 
-const DetailSidebar = ({ title, content }) => {
+const DetailSidebar = ({ children }) => {
+  if (!children) return null;
   return (
-    <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-      <SidebarHeader className="gap-3.5 border-b p-4">
-        <div className="text-base font-medium text-foreground">{title}</div>
-      </SidebarHeader>
-
-      <SidebarContent>
-        <SidebarGroup className="px-0">
-          <SidebarGroupContent>{content}</SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+    <Sidebar
+      collapsible="none"
+      className="hidden flex-1 border-r md:flex h-screen"
+    >
+      <SidebarContent>{children}</SidebarContent>
     </Sidebar>
   );
 };

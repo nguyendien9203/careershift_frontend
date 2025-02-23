@@ -11,11 +11,11 @@ const Layout = ({ children }) => {
         "--sidebar-width": "250px",
       }}
     >
-      <div className="flex w-full h-screen">
+      <div className="flex w-full h-screen overflow-hidden">
         <MainSidebar />
         <SidebarInset>
           <Header />
-          <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+          <main className="flex flex-1 flex-col gap-4">{children}</main>
         </SidebarInset>
       </div>
     </SidebarProvider>
