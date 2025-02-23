@@ -3,13 +3,4 @@
 @tailwind utilities;
 
 @layer components {
-  /* container */
-  .container {
-    @apply flex w-[calc(100%-64px)] flex-1 flex-col p-2 xs:p-5;
-  }
-
-  /* sidebar */
-  .sidebar {
-    @apply sticky left-0 top-0 flex h-dvh flex-col justify-between px-4 py-5 border-r border-secondary-200 relative;
-  }
 }

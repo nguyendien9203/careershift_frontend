@@ -43,7 +43,7 @@ const Sidebar = ({ session }) => {
               );
             })}
 
-            <div className="p-2">
+            {/* <div className="p-2">
               <Image
                 src={"/icons/user.svg"}
                 width={20}
@@ -51,7 +51,7 @@ const Sidebar = ({ session }) => {
                 alt="User Avatar"
                 className="rounded-full"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

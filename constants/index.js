@@ -1,27 +1,35 @@
+import {
+  House,
+  BriefcaseBusiness,
+  CalendarDays,
+  Settings,
+  Bell,
+} from "lucide-react";
+
 export const sideBarLinks = [
   {
     img: "/icons/house.svg",
     route: "/",
-    text: "Bảng điều khiển",
+    title: "Bảng điều khiển",
   },
   {
-    img: "/icons/briefcase.svg",
+    img: "/icons/briefcase-business.svg",
     route: "/recruitment",
-    text: "Tuyển dụng",
+    title: "Tuyển dụng",
   },
   {
-    img: "/icons/calendar.svg",
+    img: "/icons/calendar-days.svg",
     route: "/calendar",
-    text: "Lịch phỏng vấn",
+    title: "Lịch phỏng vấn",
   },
   {
     img: "/icons/settings.svg",
     route: "/settings",
-    text: "Cài đặt",
+    title: "Cài đặt",
   },
   {
     img: "/icons/bell.svg",
     route: "/notifications",
-    text: "Thông báo",
+    title: "Thông báo",
   },
 ];

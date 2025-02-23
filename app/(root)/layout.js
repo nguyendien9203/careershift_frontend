@@ -1,17 +1,24 @@
 import React from "react";
 
-import "@/styles/index.css";
-import Sidebar from "@/components/Sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import MainSidebar from "@/components/MainSidebar";
+import Header from "@/components/Header";
 
-const Layout = async ({ children }) => {
+const Layout = ({ children }) => {
   return (
-    <main className="flex min-h-screen w-full flex-row">
-      <Sidebar />
-      <div className="container">
-        <p>Header</p>
-        {children}
+    <SidebarProvider
+      style={{
+        "--sidebar-width": "250px",
+      }}
+    >
+      <div className="flex w-full h-screen">
+        <MainSidebar />
+        <SidebarInset>
+          <Header />
+          <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+        </SidebarInset>
       </div>
-    </main>
+    </SidebarProvider>
   );
 };
 
