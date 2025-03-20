@@ -11,7 +11,9 @@ import DashboardPage from "../pages/dashboard/DashboardPage";
 import JobListPage from "../pages/job/JobListPage";
 import JobDetailPage from "../pages/job/JobDetailPage";
 import JobAddPage from "../pages/job/JobAddPage";
-
+import InterviewSchedule from "../pages/interview/InterviewSchedule";
+import ConductInterview from "../pages/interview/ConductInterview"; 
+import UserSchedule from "../pages/interview/UserSchedule"; // Đã import trước đó
 const AppRoutes: React.FC = () => {
   return (
     <Router>
@@ -36,6 +38,9 @@ const AppRoutes: React.FC = () => {
           <Route path="/recruitment/jobs" element={<JobListPage />} />
           <Route path="/recruitment/jobs/:slug" element={<JobDetailPage />} />
           <Route path="/recruitment/job/add" element={<JobAddPage />} />
+          <Route path="/interview/schedule" element={<InterviewSchedule />} /> {/* Thêm route */}
+          <Route path="/interview/conduct" element={<ConductInterview />} /> {/* Thêm route */}
+          <Route path="/interview/user-schedule" element={<UserSchedule />} />
         </Route>
       </Routes>
     </Router>

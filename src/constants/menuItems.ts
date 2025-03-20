@@ -49,6 +49,18 @@ export const MENU_ITEMS: Item[] = [
         path: "/interview/schedule",
         permission: "view_schedules",
       },
+      {
+        id: "conduct-interview",
+        label: "Tiến hành phỏng vấn",
+        path: "/interview/conduct",
+        permission: "conduct_interviews",
+      },
+      {
+        id: "user-schedule",
+        label: "Lịch phỏng vấn của User", // Đổi từ "Lịch công việc của User"
+        path: "/interview/user-schedule",
+        permission: "view_user_schedule",
+      },
     ],
   },
   {
