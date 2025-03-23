@@ -18,6 +18,9 @@ interface CandidateComparison {
   job: Job;
   selectedCandidates: Candidate[];
 }
+interface CandidateStatus {
+  [candidateId: string]: 'DONE' | null;
+}
 
 // Define a flattened candidate type for display
 interface FlattenedCandidate {
@@ -27,6 +30,7 @@ interface FlattenedCandidate {
   phone: string;
   jobTitle: string;
   jobId: string;
+  offerStatus?: 'DONE' | 'PENDING' | null; // Thêm trường này
 }
 
 // Define the Offer type based on the offerSchema (consistent with OfferSalary.tsx)
@@ -35,6 +39,8 @@ interface OfferInput {
   candidateId: string;
   baseSalary: number;
   salary: number;
+  bonus:number;
+  note: string;
   approvalRequired: boolean;
   status: 'SENT' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'MANAGER_APPROVAL' | 'MANAGER_REJECTED';
   managerStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -47,7 +53,7 @@ const CandidateList: React.FC = () => {
   const [filteredCandidates, setFilteredCandidates] = useState<FlattenedCandidate[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [offerStatus, setOfferStatus] = useState<CandidateStatus>({});
   // State for filters
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOption, setSortOption] = useState<string>('nameAsc');
@@ -62,6 +68,8 @@ const CandidateList: React.FC = () => {
     candidateId: '',
     baseSalary: 0,
     salary: 0,
+    bonus:0,
+    note: '',
     approvalRequired: false,
     status: 'PENDING',
     managerStatus: 'PENDING',
@@ -162,6 +170,8 @@ const CandidateList: React.FC = () => {
       candidateId: candidate.id,
       baseSalary: 0,
       salary: 0,
+      bonus:0,
+      note: '',
       approvalRequired: false,
       status: 'PENDING',
       managerStatus: 'PENDING',
@@ -178,6 +188,8 @@ const CandidateList: React.FC = () => {
       candidateId: '',
       baseSalary: 0,
       salary: 0,
+      bonus:0,
+      note: '',
       approvalRequired: false,
       status: 'PENDING',
       managerStatus: 'PENDING',
@@ -186,28 +198,64 @@ const CandidateList: React.FC = () => {
 
   // Handle form input changes
   const handleFormChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = event.target;
-    const checked = (event.target as HTMLInputElement).checked;
-    setOfferForm((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+
+    // Chỉ xử lý các trường nhập là số
+    if (type === 'number') {
+      // Loại bỏ ký tự không phải số và format lại giá trị
+      let formattedValue = value.replace(/\D/g, ''); // Loại bỏ tất cả ký tự không phải số
+      formattedValue = new Intl.NumberFormat('vi-VN').format(Number(formattedValue) || 0); // Định dạng theo tiền Việt Nam
+
+      // Cập nhật lại giá trị trong form
+      setOfferForm((prev) => ({
+        ...prev,
+        [name]: formattedValue,
+      }));
+    } else {
+      setOfferForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
+  // Định dạng giá trị tiền tệ Việt Nam (hiển thị như tiền)
+  const formatCurrency = (amount: string) => {
+    return new Intl.NumberFormat('vi-VN').format(Number(amount.replace(/\D/g, '')) || 0);
+  };
+  const handleSendEmail = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/candidates/send_email');
+      alert('Email sent successfully!');
+      console.log('Email response:', response.data);
+    } catch (err) {
+      alert('Failed to send email. Please try again.');
+      console.error('Error sending email:', err);
+    }
+  };
   // Handle creating an offer
   const handleCreateOffer = async (event: React.FormEvent) => {
     event.preventDefault();
+    
     try {
       const offerData = {
         ...offerForm,
-        baseSalary: Number(offerForm.baseSalary),
-        salary: Number(offerForm.salary),
+        baseSalary: Number(offerForm.baseSalary.toString().replace(/\D/g, '')),
+        salary: Number(offerForm.salary.toString().replace(/\D/g, '')),
+        bonus: Number(offerForm.bonus.toString().replace(/\D/g, '')),
       };
-      const response = await axios.post('http://localhost:5000/api/offer', offerData);
+      const response = await axios.post(`http://localhost:5000/api/offers/create/${selectedCandidate?.id}`, offerData);
       alert(`Offer created successfully for ${selectedCandidate?.name}!`);
       console.log('Offer created:', response.data);
+      // Update status and close modal
+      if (selectedCandidate) {
+        setOfferStatus(prev => ({
+          ...prev,
+          [selectedCandidate.id]: 'DONE'
+        }));
+      }
       closeModal();
     } catch (err) {
       alert('Failed to create offer. Please try again.');
@@ -493,6 +541,14 @@ const CandidateList: React.FC = () => {
           .error-text {
             color: #dc3545;
           }
+            .action-button.pending {
+            background-color: #ffc107;
+            cursor: not-allowed;
+          }
+
+          .action-button.pending:hover {
+            background-color: #e0a800;
+          }
         `}
       </style>
 
@@ -572,17 +628,33 @@ const CandidateList: React.FC = () => {
               <td>{candidate.phone}</td>
               <td>{candidate.jobTitle}</td>
               <td>
-                <button
-                  className="action-button"
-                  onClick={() => openModal(candidate)}
-                >
-                  Create Offer
-                </button>
+                {offerStatus[candidate.id] === 'DONE' ? (
+                  <button
+                    className="action-button done"
+                    disabled
+                  >
+                    Done
+                  </button>
+                ) : (
+                  <button
+                    className="action-button"
+                    onClick={() => openModal(candidate)}
+                  >
+                    Create Offer
+                  </button>
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <button
+              className="action-button"
+              style={{ backgroundColor: '#28a745' }} // Green color to differentiate
+              onClick={handleSendEmail}
+            >
+              Send Email
+            </button>
 
       {/* Modal for creating an offer */}
       {isModalOpen && selectedCandidate && (
@@ -593,66 +665,53 @@ const CandidateList: React.FC = () => {
             </button>
             <div className="modal-header">Tạo Offer cho {selectedCandidate.name}</div>
             <form className="modal-form" onSubmit={handleCreateOffer}>
-              <div className="form-group">
-                <label>Lương cơ bản (VND)</label>
-                <input
-                  type="number"
-                  name="baseSalary"
-                  value={offerForm.baseSalary}
-                  onChange={handleFormChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="form-group">
-                <label>Lương cuối cùng (VND)</label>
-                <input
-                  type="number"
-                  name="salary"
-                  value={offerForm.salary}
-                  onChange={handleFormChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="approvalRequired"
-                    checked={offerForm.approvalRequired}
-                    onChange={handleFormChange}
-                  />
-                  Cần phê duyệt
-                </label>
-              </div>
-              <div className="form-group">
-                <label>Trạng thái Offer</label>
-                <select
-                  name="status"
-                  value={offerForm.status}
-                  onChange={handleFormChange}
-                >
-                  <option value="SENT">SENT</option>
-                  <option value="PENDING">PENDING</option>
-                  <option value="ACCEPTED">ACCEPTED</option>
-                  <option value="REJECTED">REJECTED</option>
-                  <option value="MANAGER_APPROVAL">MANAGER_APPROVAL</option>
-                  <option value="MANAGER_REJECTED">MANAGER_REJECTED</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Trạng thái Quản lý</label>
-                <select
-                  name="managerStatus"
-                  value={offerForm.managerStatus}
-                  onChange={handleFormChange}
-                >
-                  <option value="PENDING">PENDING</option>
-                  <option value="APPROVED">APPROVED</option>
-                  <option value="REJECTED">REJECTED</option>
-                </select>
-              </div>
+            <div className="form-group">
+              <label>Lương cơ bản (VND)</label>
+              <input
+                type="text" // Đổi thành type="text" để có thể hiển thị định dạng tiền
+                name="baseSalary"
+                value={offerForm.baseSalary}
+                onChange={handleFormChange}
+                required
+                placeholder="0"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Thưởng (VND)</label>
+              <input
+                type="text" // Đổi thành type="text" để có thể hiển thị định dạng tiền
+                name="bonus"
+                value={offerForm.bonus}
+                onChange={handleFormChange}
+                required
+                placeholder="0"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Lương cuối cùng (VND)</label>
+              <input
+                type="text" // Đổi thành type="text" để có thể hiển thị định dạng tiền
+                name="salary"
+                value={offerForm.salary}
+                onChange={handleFormChange}
+                required
+                placeholder="0"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Ghi chú</label>
+              <textarea
+                name="note"
+                value={offerForm.note}
+                onChange={handleFormChange}
+                required
+              />
+            </div>
+
+
               <div className="modal-actions">
                 <button type="button" className="modal-button cancel" onClick={closeModal}>
                   Hủy
@@ -665,6 +724,7 @@ const CandidateList: React.FC = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

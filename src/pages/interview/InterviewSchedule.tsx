@@ -371,9 +371,9 @@
 //     const fetchData = async () => {
 //       try {
 //         const [interviewResponse, recruitmentResponse, usersResponse] = await Promise.all([
-//           axios.get("http://localhost:5000/api/interviews"),
-//           axios.get("http://localhost:5000/api/recruitment-options"),
-//           axios.get("http://localhost:5000/api/userss"),
+//           axios.get("http://localhost:9999/api/interviews"),
+//           axios.get("http://localhost:9999/api/recruitment-options"),
+//           axios.get("http://localhost:9999/api/userss"),
 //         ]);
 
 //         if (interviewResponse.data.success) setInterviews(interviewResponse.data.data);
@@ -395,7 +395,7 @@
 //   const fetchInterviewById = async (id: string) => {
 //     setDetailsLoading(true);
 //     try {
-//       const response = await axios.get(`http://localhost:5000/api/interviews/${id}`);
+//       const response = await axios.get(`http://localhost:9999/api/interviews/${id}`);
 //       if (response.data.success) {
 //         setSelectedInterview(response.data.data);
 //         fetchAdditionalDetails(response.data.data);
@@ -411,13 +411,13 @@
 
 //   const fetchAdditionalDetails = async (interview: Interview) => {
 //     try {
-//       const recruitmentResponse = await axios.get(`http://localhost:5000/api/recruitments/${interview.recruitmentId}`);
+//       const recruitmentResponse = await axios.get(`http://localhost:9999/api/recruitments/${interview.recruitmentId}`);
 //       const recruitment = recruitmentResponse.data;
 //       if (!recruitment) throw new Error("Recruitment not found");
 
 //       const [candidateResponse, jobResponse] = await Promise.all([
-//         axios.get(`http://localhost:5000/api/candidates/${recruitment.candidateId}`),
-//         axios.get(`http://localhost:5000/api/jobs/${recruitment.jobId}`),
+//         axios.get(`http://localhost:9999/api/candidates/${recruitment.candidateId}`),
+//         axios.get(`http://localhost:9999/api/jobs/${recruitment.jobId}`),
 //       ]);
 
 //       setCandidate(candidateResponse.data || { _id: "unknown", name: "Không xác định" });
@@ -426,7 +426,7 @@
 //       const allInterviewerIds = Array.from(new Set(interview.stages.flatMap((stage) => stage.interviewerIds)));
 //       if (allInterviewerIds.length > 0) {
 //         const interviewerResponses = await Promise.all(
-//           allInterviewerIds.map((id) => axios.get(`http://localhost:5000/api/userss/${id}`))
+//           allInterviewerIds.map((id) => axios.get(`http://localhost:9999/api/userss/${id}`))
 //         );
 //         const interviewerMap = interviewerResponses.reduce((acc, res) => {
 //           acc[res.data._id] = res.data || { name: "Không xác định", email: "N/A" };
@@ -454,7 +454,7 @@
 //       return;
 //     }
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/createInterviewStage", {
+//       const response = await axios.post("http://localhost:9999/api/createInterviewStage", {
 //         interviewId: selectedInterview._id,
 //         round: selectedInterview.stages.length + 1,
 //         type: newStageType,
@@ -477,7 +477,7 @@
 
 //   const handleSendEmailClick = async (id: string) => {
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/send-interview-invitation", { interviewId: id });
+//       const response = await axios.post("http://localhost:9999/api/send-interview-invitation", { interviewId: id });
 //       if (response.data.success) alert("Gửi thư mời phỏng vấn thành công!");
 //       else alert("Gửi thư mời thất bại: " + response.data.message);
 //     } catch (err) {
@@ -488,7 +488,7 @@
 
 //   const handleConductInterviewClick = async (id: string) => {
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/updateFinalStatus", { interviewId: id });
+//       const response = await axios.post("http://localhost:9999/api/updateFinalStatus", { interviewId: id });
 //       if (response.data.success) {
 //         alert("Cập nhật trạng thái phỏng vấn thành công!");
 //         fetchInterviewById(id);
@@ -530,7 +530,7 @@
 //     }
 
 //     try {
-//       const response = await axios.put("http://localhost:5000/api/interviews/update-stage", {
+//       const response = await axios.put("http://localhost:9999/api/interviews/update-stage", {
 //         interviewId: selectedInterview._id,
 //         round: currentRound,
 //         interviewerId: selectedInterviewerId,
@@ -563,7 +563,7 @@
 
 //   const handleCancelInterview = async (id: string) => {
 //     try {
-//       const response = await axios.put(`http://localhost:5000/api/cancel/${id}`);
+//       const response = await axios.put(`http://localhost:9999/api/cancel/${id}`);
 //       if (response.data.success) {
 //         alert("Hủy phỏng vấn thành công!");
 //         fetchInterviewById(id);
@@ -634,7 +634,7 @@
 //         mode: addMode,
 //         ...(addMode === "ONLINE" ? { google_meet_link: addGoogleMeetLink } : { address: addAddress }),
 //       };
-//       const response = await axios.post("http://localhost:5000/api/createInterviews", interviewData);
+//       const response = await axios.post("http://localhost:9999/api/createInterviews", interviewData);
 //       if (response.data.success) {
 //         alert("Thêm lịch phỏng vấn thành công!");
 //         setInterviews([...interviews, response.data.data]);
@@ -681,7 +681,7 @@
 //   const handleUpdateDateTime = async () => {
 //     if (!selectedInterview) return;
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/updateInterviewDateTime", {
+//       const response = await axios.post("http://localhost:9999/api/updateInterviewDateTime", {
 //         interviewId: selectedInterview._id,
 //         date: editDate,
 //         time: editTime,
@@ -702,7 +702,7 @@
 //   const handleUpdateMode = async () => {
 //     if (!selectedInterview) return;
 //     try {
-//       const response = await axios.put(`http://localhost:5000/api/update-mode/${selectedInterview._id}`, {
+//       const response = await axios.put(`http://localhost:9999/api/update-mode/${selectedInterview._id}`, {
 //         mode: editMode,
 //         ...(editMode === "ONLINE" ? { google_meet_link: editGoogleMeetLink } : { address: editAddress }),
 //       });
@@ -722,7 +722,7 @@
 //   const handleUpdateFinalStatus = async () => {
 //     if (!selectedInterview) return;
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/updateFinalStatus", {
+//       const response = await axios.post("http://localhost:9999/api/updateFinalStatus", {
 //         interviewId: selectedInterview._id,
 //         finalStatus: editFinalStatus,
 //       });
@@ -742,7 +742,7 @@
 //   const handleUpdatePassFail = async () => {
 //     if (!selectedInterview) return;
 //     try {
-//       const response = await axios.put("http://localhost:5000/api/update-pass-fail", {
+//       const response = await axios.put("http://localhost:9999/api/update-pass-fail", {
 //         interviewId: selectedInterview._id,
 //         round: editRound,
 //         status: editPassFailStatus,
@@ -1864,9 +1864,9 @@ const InterviewSchedule: React.FC = () => {
     const fetchInitialData = async () => {
       try {
         const [interviewRes, recruitmentRes, usersRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/interviews"),
-          axios.get("http://localhost:5000/api/recruitment-options"),
-          axios.get("http://localhost:5000/api/userss"),
+          axios.get("http://localhost:9999/api/interviews"),
+          axios.get("http://localhost:9999/api/recruitment-options"),
+          axios.get("http://localhost:9999/api/userss"),
         ]);
 
         if (interviewRes.data.success) setInterviews(interviewRes.data.data);
@@ -1886,7 +1886,7 @@ const InterviewSchedule: React.FC = () => {
   const fetchInterviewDetails = async (id: string) => {
     setDetailsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/interviews/${id}`);
+      const response = await axios.get(`http://localhost:9999/api/interviews/${id}`);
       if (response.data.success) {
         setSelectedInterview(response.data.data);
         await fetchAdditionalDetails(response.data.data);
@@ -1902,13 +1902,13 @@ const InterviewSchedule: React.FC = () => {
   const fetchAdditionalDetails = async (interview: Interview) => {
     try {
       const recruitmentRes = await axios.get(
-        `http://localhost:5000/api/recruitments/${interview.recruitmentId}`
+        `http://localhost:9999/api/recruitments/${interview.recruitmentId}`
       );
       const recruitment = recruitmentRes.data;
 
       const [candidateRes, jobRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/candidates/${recruitment.candidateId}`),
-        axios.get(`http://localhost:5000/api/jobs/${recruitment.jobId}`),
+        axios.get(`http://localhost:9999/api/candidates/${recruitment.candidateId}`),
+        axios.get(`http://localhost:9999/api/jobs/${recruitment.jobId}`),
       ]);
 
       setCandidate(candidateRes.data);
@@ -1917,7 +1917,7 @@ const InterviewSchedule: React.FC = () => {
       const interviewerIds = Array.from(new Set(interview.stages.flatMap((s) => s.interviewerIds)));
       if (interviewerIds.length) {
         const interviewerResponses = await Promise.all(
-          interviewerIds.map((id) => axios.get(`http://localhost:5000/api/users/${id}`))
+          interviewerIds.map((id) => axios.get(`http://localhost:9999/api/users/${id}`))
         );
         setInterviewers(
           interviewerResponses.reduce((acc, res) => {
@@ -1938,7 +1938,7 @@ const InterviewSchedule: React.FC = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:5000/api/createInterviews", {
+      const response = await axios.post("http://localhost:9999/api/createInterviews", {
         recruitmentId: addRecruitmentId,
         date: new Date(addDate).toISOString(),
         time: addTime,
@@ -1963,7 +1963,7 @@ const InterviewSchedule: React.FC = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:5000/api/createInterviewStage", {
+      const response = await axios.post("http://localhost:9999/api/createInterviewStage", {
         interviewId: selectedInterview._id,
         round: selectedInterview.stages.length + 1,
         type: newStageType,
@@ -2002,7 +2002,7 @@ const InterviewSchedule: React.FC = () => {
     }
 
     try {
-      const response = await axios.put("http://localhost:5000/api/interviews/update-stage", {
+      const response = await axios.put("http://localhost:9999/api/interviews/update-stage", {
         interviewId: selectedInterview._id,
         round: currentRound,
         interviewerId: selectedInterviewerId,
@@ -2189,7 +2189,7 @@ const InterviewSchedule: React.FC = () => {
                     <button
                       style={{ ...styles.actionButton, ...styles.cancelButton }}
                       onClick={() =>
-                        handleUpdateField(`http://localhost:5000/api/cancel/${interview._id}`, {})
+                        handleUpdateField(`http://localhost:9999/api/cancel/${interview._id}`, {})
                       }
                     >
                       Hủy
@@ -2299,7 +2299,7 @@ const InterviewSchedule: React.FC = () => {
                 style={styles.modalSendEmailButton}
                 onClick={() =>
                   axios
-                    .post("http://localhost:5000/api/send-interview-invitation", {
+                    .post("http://localhost:9999/api/send-interview-invitation", {
                       interviewId: selectedInterview._id,
                     })
                     .then((res) => res.data.success && alert("Gửi email thành công!"))
@@ -2622,7 +2622,7 @@ const InterviewSchedule: React.FC = () => {
               <button
                 style={styles.saveButton}
                 onClick={() =>
-                  handleUpdateField("http://localhost:5000/api/updateInterviewDateTime", {
+                  handleUpdateField("http://localhost:9999/api/updateInterviewDateTime", {
                     interviewId: selectedInterview!._id,
                     date: editDate,
                     time: editTime,
@@ -2680,7 +2680,7 @@ const InterviewSchedule: React.FC = () => {
               <button
                 style={styles.saveButton}
                 onClick={() =>
-                  handleUpdateField(`http://localhost:5000/api/update-mode/${selectedInterview!._id}`, {
+                  handleUpdateField(`http://localhost:9999/api/update-mode/${selectedInterview!._id}`, {
                     mode: editMode,
                     ...(editMode === "ONLINE" ? { google_meet_link: editGoogleMeetLink } : { address: editAddress }),
                   }).then(() => setEditModeModal(false))
@@ -2717,7 +2717,7 @@ const InterviewSchedule: React.FC = () => {
               <button
                 style={styles.saveButton}
                 onClick={() =>
-                  handleUpdateField("http://localhost:5000/api/updateFinalStatus", {
+                  handleUpdateField("http://localhost:9999/api/updateFinalStatus", {
                     interviewId: selectedInterview!._id,
                     finalStatus: editFinalStatus,
                   }).then(() => setEditFinalStatusModal(false))
@@ -2757,7 +2757,7 @@ const InterviewSchedule: React.FC = () => {
               <button
                 style={styles.saveButton}
                 onClick={() =>
-                  handleUpdateField("http://localhost:5000/api/update-pass-fail", {
+                  handleUpdateField("http://localhost:9999/api/update-pass-fail", {
                     interviewId: selectedInterview!._id,
                     round: editRound,
                     status: editPassFailStatus,
