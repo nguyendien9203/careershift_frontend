@@ -14,7 +14,7 @@ import JobAddPage from "../pages/job/JobAddPage";
 import InterviewSchedule from "../pages/interview/InterviewSchedule";
 import ConductInterview from "../pages/interview/ConductInterview"; 
 import UserSchedule from "../pages/interview/UserSchedule"; // Đã import trước đó
-import Offer from "../pages/Offer/OfferSalary"; // Đã import trước đó
+import Offer from "../pages/Offer/OfferSalary"; 
 
 const AppRoutes: React.FC = () => {
   return (
