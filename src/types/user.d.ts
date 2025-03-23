@@ -28,3 +28,9 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface CreateUserPayload {
+  name: string;
+  email: string;
+  roles: string;
+}

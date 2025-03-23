@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Role, User } from "../../types/user";
-import { getAllUsers } from "../../services/userService";
+import { getAllUsers, assignRoleToUser } from "../../services/userService";
 import { getRoles } from "../../services/roleService";
 import Tag from "../common/shared/Tag";
 import { USER_STATUS } from "../../constants/userStatus";
-import { Select } from "antd";
+import { message, Select } from "antd";
 import Button from "../common/shared/Button";
 
-const UserRoleManager: React.FC = () => {
+const UserRoleManager: React.FC<{
+  refreshUsers: boolean;
+  onDeleteUser: (userId: string) => void;
+}> = ({ refreshUsers, onDeleteUser }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   const [userRoles, setUserRoles] = useState<{ [key: string]: string }>({});
@@ -50,24 +53,20 @@ const UserRoleManager: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [refreshUsers]);
 
-  const updateRole = (userId: string, roleId: string) => {
-    setUserRoles((prev) => ({ ...prev, [userId]: roleId }));
+  const updateRole = async (userId: string, roleId: string) => {
+    try {
+      const response = await assignRoleToUser(userId, roleId);
+      setUserRoles((prevRoles) => ({
+        ...prevRoles,
+        [userId]: roleId,
+      }));
 
-    setUsers(
-      users.map((user) =>
-        user._id === userId
-          ? {
-              ...user,
-              roles: {
-                _id: roleId,
-                name: roles.find((role) => role.value === roleId)?.label || "",
-              },
-            }
-          : user
-      )
-    );
+      message.success(response.message);
+    } catch (error: any) {
+      message.error(error.message);
+    }
   };
 
   return (
@@ -103,7 +102,11 @@ const UserRoleManager: React.FC = () => {
 
             {/* Delete Button */}
             <div className="flex justify-end col-span-1">
-              <Button variant="danger" icon="bi-trash" />
+              <Button
+                variant="danger"
+                icon="bi-trash"
+                onClick={() => onDeleteUser(user._id)}
+              />
             </div>
           </div>
         ))}

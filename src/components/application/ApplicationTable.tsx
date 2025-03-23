@@ -15,7 +15,6 @@ import CandidateDetailDrawer from "../candidate/CandidateDetailDrawer";
 import { Job } from "../../types/job";
 import { updateRecruitmentStatus } from "../../services/applicationService";
 import { message } from "antd";
-import AddRecruitmentDrawer from "./AddRecruitmentDrawer";
 
 const columns: Column[] = [
   {

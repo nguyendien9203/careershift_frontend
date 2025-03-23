@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import Drawer from "../common/shared/Drawer";
 import Input from "../common/shared/Input";
 import Button from "../common/shared/Button";
-import {
-  ApplyForJobPayload,
-  ApplyForJobRequest,
-} from "../../types/application";
+import { ApplyForJobRequest } from "../../types/application";
 import { message } from "antd";
 
 interface AddRecruitmentDrawerProps {
