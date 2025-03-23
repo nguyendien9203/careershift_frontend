@@ -58,6 +58,13 @@ interface ModalProps {
     updateOffer: (offerId: string, negotiatedSalary: number) => void;
 }
 
+interface StatusModalProps {
+    offerId: string;
+    isOpen: boolean;
+    closeModal: () => void;
+    updateOfferStatus: (offerId: string, action: 'ACCEPT' | 'REJECT') => void;
+}
+
 const OfferStatusList: React.FC = () => {
     const [offers, setOffers] = useState<EnhancedOffer[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -70,6 +77,9 @@ const OfferStatusList: React.FC = () => {
     const [negotiatedSalary, setNegotiatedSalary] = useState<number>(0);
     const [updateError, setUpdateError] = useState<string | null>(null);
     const [isUpdating, setIsUpdating] = useState(false); // New state for loading feedback
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [selectedAction, setSelectedAction] = useState<'ACCEPT' | 'REJECT' | null>(null);
+
     const statusOptions = [
         { value: 'ALL', label: 'Tất cả' },
         { value: 'PENDING', label: 'Pending' },
@@ -189,58 +199,6 @@ const OfferStatusList: React.FC = () => {
         setUpdateError(null);
     };
 
-    // const handleUpdateSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     console.log('handleUpdateSubmit called with selectedOfferId:', selectedOfferId);
-    //     if (!selectedOfferId) {
-    //         console.log('No selectedOfferId, returning early');
-    //         return;
-    //     }
-
-    //     setIsUpdating(true);
-    //     setUpdateError(null);
-
-    //     try {
-    //         console.log('Sending update request:', {
-    //             offerId: selectedOfferId,
-    //             negotiatedSalary,
-    //             updatedBy: "currentUserId",
-    //         });
-
-    //         const response = await axios.put(
-    //             `http://localhost:5000/api/offers/update/${selectedOfferId}`,
-    //             {
-    //                 negotiatedSalary: negotiatedSalary,
-    //                 updatedBy: "currentUserId",
-    //             },
-    //             { timeout: 10000 }
-    //         );
-
-    //         console.log('API Response:', response.data);
-    //         setOffers((prevOffers) =>
-    //             prevOffers.map((offer) =>
-    //                 offer.id === selectedOfferId ? response.data.offer : offer
-    //             )
-    //         );
-
-    //         setIsModalOpen(false);
-    //         setSelectedOfferId(null);
-    //         setNegotiatedSalary(0);
-    //     } catch (err) {
-    //         const error = err as AxiosError<{ message?: string }>;
-    //         console.error('Detailed error:', {
-    //             message: error.message,
-    //             status: error.response?.status,
-    //             data: error.response?.data,
-    //             headers: error.response?.headers,
-    //         });
-    //         const errorMessage = error.response?.data?.message || 'Lỗi khi cập nhật offer';
-    //         setUpdateError(errorMessage);
-    //     } finally {
-    //         setIsUpdating(false);
-    //     }
-    // };
-
     const handleUpdateSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('handleUpdateSubmit called with selectedOfferId:', selectedOfferId);
@@ -296,8 +254,85 @@ const OfferStatusList: React.FC = () => {
             setIsUpdating(false);
         }
     };
+    const handleStatusUpdateClick = (offerId: string) => {
+        setSelectedOfferId(offerId);
+        setIsStatusModalOpen(true);
+        setSelectedAction(null);
+        setUpdateError(null);
+    };
 
-
+    const handleStatusUpdateSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        console.log('handleStatusUpdateSubmit started', {
+            selectedOfferId,
+            selectedAction,
+        });
+    
+        if (!selectedOfferId || !selectedAction) {
+            console.warn('Missing required parameters', {
+                selectedOfferId,
+                selectedAction,
+            });
+            return;
+        }
+    
+        setIsUpdating(true);
+        setUpdateError(null);
+        console.log('State set: isUpdating = true, updateError = null');
+    
+        try {
+            console.log('Making API request with:', {
+                url: `http://localhost:5000/api/offers/status/${selectedOfferId}`,
+                data: {
+                    action: selectedAction,
+                    updatedBy: null,
+                },
+                config: { timeout: 10000 },
+            });
+    
+            const response = await axios.put(
+                `http://localhost:5000/api/offers/status/${selectedOfferId}`,
+                {
+                    action: selectedAction,
+                    updatedBy: null, // You might want to add actual user info here
+                },
+                { timeout: 10000 }
+            );
+    
+            console.log('API response received:', {
+                status: response.status,
+                data: response.data,
+            });
+    
+            setOffers((prevOffers) => {
+                const updatedOffers = prevOffers.map((offer) =>
+                    offer.id === selectedOfferId ? response.data.offer : offer
+                );
+                console.log('Offers updated:', updatedOffers);
+                return updatedOffers;
+            });
+    
+            console.log('Closing modal and resetting state');
+            setIsStatusModalOpen(false);
+            setSelectedOfferId(null);
+            setSelectedAction(null);
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string }>;
+            console.error('Error occurred during status update:', {
+                message: error.message,
+                responseStatus: error.response?.status,
+                responseData: error.response?.data,
+                request: error.request,
+                config: error.config,
+            });
+            setUpdateError(error.response?.data?.message || 'Lỗi khi cập nhật trạng thái');
+            console.log('Update error set:', error.response?.data?.message || 'Lỗi khi cập nhật trạng thái');
+        } finally {
+            setIsUpdating(false);
+            console.log('Finally block executed: isUpdating = false');
+        }
+    };
     if (loading) return <div className="loading-text">Đang tải dữ liệu...</div>;
     if (error) return <div className="error-text">{error}</div>;
     const isPendingView = selectedStatus === 'PENDING';
@@ -519,6 +554,27 @@ const OfferStatusList: React.FC = () => {
 .cancel-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+
+  .status-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.action-button.status-update {
+    margin-left: 5px;
+    background-color: #4a90e2;
+}
+
+.action-button.selected {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.action-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 }
          `}
             </style>
@@ -560,44 +616,48 @@ const OfferStatusList: React.FC = () => {
                         <th>Lương cuối cùng</th>
                         <th>Lương update</th>
                         <th>Trạng thái</th>
-                        <th>{isPendingView ? 'Update Offer' : 'Trạng thái quản lý'}</th>                    </tr>
-                </thead>
+                        <th>{isPendingView ? 'Hành động' : 'Trạng thái quản lý'}</th>
+                        
+                    </tr>          
+                          </thead>
                 <tbody>
-                    {currentOffers.map((offer, index) => {
-                        console.log(`Offer ${index}:`, offer,offer.bonus,typeof offer.bonus,); // Log toàn bộ object offer
-                        return (
-                            <tr key={offer.id || `fallback-${index}`}> {/* Thêm fallback key */}
-                                <td>{offer.candidateName}</td>
-                                <td>{offer.jobTitle}</td>
-                                <td>{formatCurrency(offer.baseSalary)}</td>
-                                <td>{formatCurrency(offer.bonus)}</td>
-                                <td>{formatCurrency(offer.salary)}</td>
-                                <td>{formatCurrency(offer.negotiatedSalary)}</td>
-                                <td>
-                                    <span className={`status-badge status-${offer.status.toLowerCase().replace('_', '-')}`}>
-                                        {offer.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    {offer.status === 'PENDING' ? (
+                {currentOffers.map((offer, index) => (
+                        <tr key={offer.id || `fallback-${index}`}>
+                            <td>{offer.candidateName}</td>
+                            <td>{offer.jobTitle}</td>
+                            <td>{formatCurrency(offer.baseSalary)}</td>
+                            <td>{formatCurrency(offer.bonus)}</td>
+                            <td>{formatCurrency(offer.salary)}</td>
+                            <td>{formatCurrency(offer.negotiatedSalary)}</td>
+                            <td>
+                                <span className={`status-badge status-${offer.status.toLowerCase().replace('_', '-')}`}>
+                                    {offer.status}
+                                </span>
+                            </td>
+                            <td>
+                                {offer.status === 'PENDING' ? (
+                                    <>
                                         <button
                                             className="action-button"
-                                            onClick={() => {
-                                                console.log('Update Offer button clicked for offer:', offer.id);
-                                                handleUpdateClick(offer.id);
-                                            }}
+                                            onClick={() => handleUpdateClick(offer.id)}
                                         >
                                             Update Offer
                                         </button>
-                                    ) : (
-                                        <span className={`status-badge status-${offer.managerStatus.toLowerCase()}`}>
-                                            {offer.managerStatus}
-                                        </span>
-                                    )}
-                                </td>
-                            </tr>
-                        );
-                    })}
+                                        <button
+                                            className="action-button status-update"
+                                            onClick={() => handleStatusUpdateClick(offer.id)}
+                                        >
+                                            Update Status
+                                        </button>
+                                    </>
+                                ) : (
+                                    <span className={`status-badge status-${offer.managerStatus.toLowerCase()}`}>
+                                        {offer.managerStatus}
+                                    </span>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
                     {currentOffers.length === 0 && (
                         <tr>
                             <td colSpan={8} style={{ textAlign: 'center' }}>
@@ -606,6 +666,62 @@ const OfferStatusList: React.FC = () => {
                         </tr>
                     )}
                 </tbody>
+                {isStatusModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>Cập nhật Trạng thái Offer</h2>
+                        <form onSubmit={handleStatusUpdateSubmit}>
+                            <div className="form-group">
+                                <label>Chọn hành động:</label>
+                                <div className="status-buttons">
+                                    <button
+                                        type="button"
+                                        className={`action-button ${selectedAction === 'ACCEPT' ? 'selected' : ''}`}
+                                        onClick={() => setSelectedAction('ACCEPT')}
+                                        disabled={isUpdating}
+                                    >
+                                        Accept
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`action-button ${selectedAction === 'REJECT' ? 'selected' : ''}`}
+                                        onClick={() => setSelectedAction('REJECT')}
+                                        disabled={isUpdating}
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+
+                            {updateError && (
+                                <div className="error-message">{updateError}</div>
+                            )}
+
+                            {isUpdating && (
+                                <div className="loading-message">Đang cập nhật...</div>
+                            )}
+
+                            <div className="modal-actions">
+                                <button
+                                    type="submit"
+                                    className="submit-button"
+                                    disabled={!selectedAction || isUpdating}
+                                >
+                                    {isUpdating ? 'Đang xử lý...' : 'Xác nhận'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="cancel-button"
+                                    onClick={() => setIsStatusModalOpen(false)}
+                                    disabled={isUpdating}
+                                >
+                                    Hủy
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
                 {isModalOpen && (
                     <div className="modal-overlay">
                         <div className="modal-content">
