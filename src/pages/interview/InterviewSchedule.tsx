@@ -1492,6 +1492,9 @@
 // export default InterviewSchedule;
 
 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 const styles = {
   container: {
     display: "flex",
@@ -1746,9 +1749,6 @@ const styles = {
     transition: "background-color 0.3s",
   },
 };
-
-import React, { useState, useEffect } from "react";
-import axios from "axios";
 
 // Define types (unchanged)
 export interface Evaluation {
@@ -2307,18 +2307,7 @@ const InterviewSchedule: React.FC = () => {
               >
                 Gửi Email
               </button>
-              <button
-                style={styles.modalConductButton}
-                onClick={() =>
-                  handleUpdateField("http://localhost:5000/api/updateFinalStatus", {
-                    interviewId: selectedInterview._id,
-                    finalStatus: "COMPLETED",
-                  })
-                }
-                disabled={isUpdating}
-              >
-                {isUpdating ? "Đang cập nhật..." : "Tiến hành Phỏng vấn"}
-              </button>
+              
               <button style={styles.modalCloseButton} onClick={() => setSelectedInterview(null)}>
                 Đóng
               </button>
