@@ -30,7 +30,7 @@ export const MENU_ITEMS: Item[] = [
       },
       {
         id: "department",
-        label: "Ban bộ phận",
+        label: "Offer Lương",
         path: "/recruitment/departments",
         permission: "view_departments",
       },

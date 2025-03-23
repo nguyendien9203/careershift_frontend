@@ -14,6 +14,8 @@ import JobAddPage from "../pages/job/JobAddPage";
 import InterviewSchedule from "../pages/interview/InterviewSchedule";
 import ConductInterview from "../pages/interview/ConductInterview"; 
 import UserSchedule from "../pages/interview/UserSchedule"; // Đã import trước đó
+import Offer from "../pages/Offer/OfferSalary"; // Đã import trước đó
+
 const AppRoutes: React.FC = () => {
   return (
     <Router>
@@ -41,6 +43,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/interview/schedule" element={<InterviewSchedule />} /> {/* Thêm route */}
           <Route path="/interview/conduct" element={<ConductInterview />} /> {/* Thêm route */}
           <Route path="/interview/user-schedule" element={<UserSchedule />} />
+          <Route path="/recruitment/departments" element={<Offer />} />
+
         </Route>
       </Routes>
     </Router>
