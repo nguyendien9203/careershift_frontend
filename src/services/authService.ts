@@ -1,83 +1,120 @@
 import axios from "axios";
 
-import { BASE_API_URL } from "../utils/config";
+import { BASE_API_URL, getAuthHeaders } from "../utils/config";
+import { get } from "http";
 
 const BASE_URL = `${BASE_API_URL}/auth`;
 
-export const login = (email: string, password: string) => {
-    return axios
-        .post(`${BASE_URL}/authenticate`, {email, password}, {
-            validateStatus: (status) => {
-                return status >= 200 && status <= 403;
-            }
-        })
-        .then((res) => {
-            return res.data;
-        })
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Đã xảy ra lỗi, vui lòng thử lại")
-        });
+export const login = async (email: string, password: string) => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/login`,
+      { email, password },
+      {
+        withCredentials: true,
+        validateStatus: (status) => status >= 200 && status <= 422,
+      }
+    );
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Đã xảy ra lỗi, vui lòng thử lại"
+    );
+  }
 };
 
-export const loginWithGoogle = (googleToken: string) => {
-    return axios
-        .post(`${BASE_URL}/login/google`, { token: googleToken})
-        .then((res) => {
-            return res.data;
-        })
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Đăng nhập thất bại");
-        });
+export const verifyAccountOtp = async (email: string, otp: string) => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/verify-otp`,
+      { email, otp },
+      { withCredentials: true }
+    );
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Có lỗi xảy ra khi xác minh OTP"
+    );
+  }
 };
 
-export const verifyAccountOtp = (email: string, otp: string) => {
-    return axios
-        .post(`${BASE_URL}/verify-account-otp`, { email, otp })
-        .then((res) => {
-            return res.data;
-        })
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Có lỗi xảy ra khi xác minh OTP");
-        });
-}
+export const resendOtpIfNeeded = async (email: string) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/send-otp`, { email });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Có lỗi xảy ra khi gửi lại mã OTP"
+    );
+  }
+};
 
-export const resendOtpIfNeeded = (email: string, purpose: string) => {
-    return axios
-        .post(`${BASE_URL}/resend-otp`, { email, purpose})
-        .then((res) => res.data)
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Có lỗi xảy ra khi gửi lại mã OTP");
-        });
-}
+export const refreshToken = async () => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/refresh-token`,
+      {},
+      { withCredentials: true }
+    );
+    console.log(res.data);
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Có lỗi xảy ra khi gửi lại mã OTP"
+    );
+  }
+};
 
-export const forgotPassword = (email: string) => {
-    return axios    
-        .post(`${BASE_URL}/forgot-password`, { email })
-        .then((res) => res.data)
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Đã xảy ra lỗi khi đặt lại mật khẩu");
-        });
-}
+export const forgotPassword = async (email: string) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/forgot-password`, { email });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Đã xảy ra lỗi khi đặt lại mật khẩu"
+    );
+  }
+};
 
-export const verifyPasswordResetOtp = (email: string, otp: string) => {
-    return axios
-        .post(`${BASE_URL}/verify-password-reset-otp`, { email, otp })
-        .then((res) => {
-            return res.data;
-        })
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Có lỗi xảy ra khi xác minh OTP");
-        });
-}
+export const verifyPasswordResetOtp = async (email: string, otp: string) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/verify-password-reset-otp`, {
+      email,
+      otp,
+    });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Có lỗi xảy ra khi xác minh OTP"
+    );
+  }
+};
 
-export const resetPassword = (email: string, password: string) => {
-    return axios
-        .post(`${BASE_URL}/reset-password`, { email, password })
-        .then((res) => {
-            return res.data;
-        })
-        .catch((error) => {
-            throw new Error(error.response?.data?.message || "Đã xảy ra lỗi khi đặt lại mật khẩu");
-        });
-}
+export const resetPassword = async (email: string, password: string) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/reset-password`, {
+      email,
+      password,
+    });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Đã xảy ra lỗi khi đặt lại mật khẩu"
+    );
+  }
+};
 
+export const logout = async () => {
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/logout`,
+      {},
+      { withCredentials: true, headers: getAuthHeaders() }
+    );
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Có lỗi xảy ra khi đăng xuat"
+    );
+  }
+};

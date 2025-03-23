@@ -1,17 +1,20 @@
 export enum ApplicationStatus {
-  PENDING = "PENDING",
-  PASSED = "PASSED",
-  FAILED = "FAILED"
+  ON_PROGRESS = "ON_PROGRESS",
+  INTERVIEW = "INTERVIEW",
+  REJECTED = "REJECTED",
+  HIRED = "HIRED",
 }
 
 export const applicationStatusOptions = [
-  { value: ApplicationStatus.PENDING, label: "Đang chờ" },
-  { value: ApplicationStatus.PASSED, label: "Đã qua" },
-  { value: ApplicationStatus.FAILED, label: "Đã loại" }
+  { value: ApplicationStatus.ON_PROGRESS, label: "Đang xử lý" },
+  { value: ApplicationStatus.INTERVIEW, label: "Phỏng vấn" },
+  { value: ApplicationStatus.REJECTED, label: "Bị từ chối" },
+  { value: ApplicationStatus.HIRED, label: "Được tuyển" },
 ];
 
 export const getApplicationStatusLabel = (value: ApplicationStatus) => {
-  const option = applicationStatusOptions.find(option => option.value === value);
+  const option = applicationStatusOptions.find(
+    (option) => option.value === value
+  );
   return option ? option.label : "Chưa xác định";
 };
-

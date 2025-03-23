@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import PrivateRoute from "./PrivateRoute";
 import MainLayout from "../layouts/MainLayout";
@@ -11,34 +11,79 @@ import DashboardPage from "../pages/dashboard/DashboardPage";
 import JobListPage from "../pages/job/JobListPage";
 import JobDetailPage from "../pages/job/JobDetailPage";
 import JobAddPage from "../pages/job/JobAddPage";
+import TeamMemberPage from "../pages/setting/TeamMemberPage";
+import ProfilePage from "../pages/setting/ProfilePage";
+import ChangePasswordPage from "../pages/setting/ChangePasswordPage";
 
 const AppRoutes: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/verify-otp" element={<VerifyOTPPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+    <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/verify-otp" element={<VerifyOTPPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* Private routes */}
-        <Route path="/" element={<MainLayout />}>
-          {/* <Route
-            index
-            element={
-              <PrivateRoute>
-                <DashboardPage />
-              </PrivateRoute>
-            }
-          /> */}
-          <Route index element={<DashboardPage />} />
-          <Route path="/recruitment/jobs" element={<JobListPage />} />
-          <Route path="/recruitment/jobs/:slug" element={<JobDetailPage />} />
-          <Route path="/recruitment/job/add" element={<JobAddPage />} />
-        </Route>
-      </Routes>
-    </Router>
+      {/* Private routes */}
+      <Route path="/" element={<MainLayout />}>
+        <Route
+          index
+          element={
+            <PrivateRoute>
+              <DashboardPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/recruitment/jobs"
+          element={
+            <PrivateRoute>
+              <JobListPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/recruitment/jobs/:id"
+          element={
+            <PrivateRoute>
+              <JobDetailPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/recruitment/job/add"
+          element={
+            <PrivateRoute>
+              <JobAddPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/team-members"
+          element={
+            <PrivateRoute>
+              <TeamMemberPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <PrivateRoute>
+              <ChangePasswordPage />
+            </PrivateRoute>
+          }
+        />
+      </Route>
+    </Routes>
   );
 };
 

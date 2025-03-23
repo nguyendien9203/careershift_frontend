@@ -1,6 +1,6 @@
 import React from "react";
 
-import Tag from "../common/shared/Tag";
+//import Tag from "../common/shared/Tag";
 import Card from "../common/shared/Card";
 import Button from "../common/shared/Button";
 import { Location, Department } from "../../types/job";
@@ -8,9 +8,9 @@ import { Location, Department } from "../../types/job";
 interface JobCardProps {
   title: string;
   subTitle?: string;
-  locations: Location[];
-  level: string;
-  departments: Department[];
+  locations?: Location[];
+  level?: string;
+  departments?: Department[];
   onDetailClick: () => void;
 }
 
@@ -32,30 +32,35 @@ const JobCard: React.FC<JobCardProps> = ({
             {subTitle && <p className="text-xs text-gray-500">{subTitle}</p>}
           </div>
           <div className="flex-[1] flex justify-end">
-            <Button variant="light" size="small" onClick={onDetailClick} className="w-fit">
+            <Button
+              variant="light"
+              size="small"
+              onClick={onDetailClick}
+              className="w-fit"
+            >
               Xem chi tiết
             </Button>
           </div>
         </div>
       }
-      content={
-        <div className="flex items-center flex-wrap gap-x-2">
-          {locations.map((loc) => (
-            <Tag
-              key={loc.id}
-              label={loc.name}
-              icon="bi-geo"
-              variant="success"
-            />
-          ))}
+      // content={
+      //   <div className="flex items-center flex-wrap gap-x-2">
+      //     {locations.map((loc) => (
+      //       <Tag
+      //         key={loc.id}
+      //         label={loc.name}
+      //         icon="bi-geo"
+      //         variant="success"
+      //       />
+      //     ))}
 
-          {departments.map((dept) => (
-            <Tag key={dept.id} label={dept.name} variant="purple" />
-          ))}
+      //     {departments.map((dept) => (
+      //       <Tag key={dept.id} label={dept.name} variant="purple" />
+      //     ))}
 
-          <Tag label={level} variant="light" />
-        </div>
-      }
+      //     <Tag label={level} variant="light" />
+      //   </div>
+      // }
     />
   );
 };

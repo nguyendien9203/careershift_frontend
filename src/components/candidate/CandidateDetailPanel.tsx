@@ -39,14 +39,14 @@ const CandidateDetailPanel: React.FC<CandidateDetailPanelProps> = ({
               <Button
                 variant="primary-link"
                 icon="bi-eye"
-                onClick={() => previewCV(application.candidate.cvUrl)}
+                //onClick={() => previewCV(application.candidate.cvUrl)}
               >
                 Xem trước
               </Button>
               <Button
                 variant="primary-link"
                 icon="bi-download"
-                onClick={() => downloadCV(application.candidate.cvUrl)}
+                //onClick={() => downloadCV(application.candidate.cvUrl)}
               >
                 Tải xuống
               </Button>

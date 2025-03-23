@@ -2,9 +2,15 @@ import axios from "axios";
 
 import { BASE_API_URL, getAuthHeaders } from "../utils/config";
 import { ApplicationStatus } from "../constants/applicationStatus";
-import { ApplicationStage } from "../constants/applicationStages";
+import {
+  Application,
+  ApplyForJobPayload,
+  ApplyForJobRequest,
+  CVFile,
+} from "../types/application";
 
-const BASE_URL = `${BASE_API_URL}/application`;
+const BASE_URL = `${BASE_API_URL}/recruitments`;
+const S3_BASE_URL = `${BASE_API_URL}/s3`;
 
 /**
  * Get a list of applications by stage with pagination and filters.
@@ -16,63 +22,106 @@ const BASE_URL = `${BASE_API_URL}/application`;
  * @param jobId - The job id to filter by (optional)
  * @returns Promise resolving to ApplicationStageResponse
  */
-export const getApplicationsByStage = (
-  pageNo: number = 1,
-  pageSize: number = 5,
-  keyword: string = "",
-  statuses: ApplicationStatus[] = [],
-  stage: ApplicationStage,
-  jobId: number
+// export const getApplicationsByStage = (
+//   pageNo: number = 1,
+//   pageSize: number = 5,
+//   keyword: string = "",
+//   statuses: ApplicationStatus[] = [],
+//   stage: ApplicationStage,
+//   jobId: number
+// ) => {
+//   const params: any = {
+//     pageNo,
+//     pageSize,
+//   };
+
+//   if (keyword) params.keyword = keyword;
+//   if (statuses.length > 0) params.statuses = statuses.join(",");
+
+//   return axios
+//     .get(`${BASE_URL}/stage/${stage}/job/${jobId}`, {
+//       headers: getAuthHeaders(),
+//       params,
+//     })
+//     .then((res) => res.data)
+//     .catch((error) => {
+//       throw new Error(error);
+//     });
+// };
+
+export const getApplicationsByStage = async (jobId: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/stages/${jobId}`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Không thể lấy thông tin tuyển dụng"
+    );
+  }
+};
+
+export const updateRecruitmentStatus = async (
+  recruitmentId: string,
+  status: string
 ) => {
-  const params: any = {
-    pageNo,
-    pageSize,
-  };
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/${recruitmentId}/update-interview-response`,
+      { status },
+      {
+        headers: getAuthHeaders(),
+      }
+    );
 
-  if (keyword) params.keyword = keyword;
-  if (statuses.length > 0) params.statuses = statuses.join(",");
-
-  return axios
-    .get(`${BASE_URL}/stage/${stage}/job/${jobId}`, {
-      headers: getAuthHeaders(),
-      params,
-    })
-    .then((res) => res.data)
-    .catch((error) => {
-      throw new Error(error);
-    });
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Lỗi khi cập nhật trạng thái tuyển dụng:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
-/**
- * Call API to reject application.
- * @param applicationId - ID of the application to be rejected.
- * @returns Promise response from the API.
- */
-export const rejectApplication = (applicationId: number) => {
-  return axios
-    .put(`${BASE_URL}/reject/${applicationId}`, null, {
-      headers: getAuthHeaders(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      throw error;
-    });
+// Upload CV to S3
+export const uploadCandidateCV = async (
+  jobId: string,
+  formData: ApplyForJobRequest
+): Promise<ApplyForJobPayload> => {
+  try {
+    const headers = {
+      ...getAuthHeaders(),
+      "Content-Type": "multipart/form-data",
+    };
+
+    const response = await axios.post(
+      `${S3_BASE_URL}/upload/${jobId}`,
+      formData,
+      {
+        headers,
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
 };
 
-/**
- * Call API to accept applications.
- * @param applicationId - ID of the application to accept.
- * @returns Promise response from the API.
- */
-export const acceptApplication = (applicationId: number) => {
-  return axios
-    .put(`${BASE_URL}/accept/${applicationId}`, null, {
+// Apply for a job
+export const applyForJob = async (
+  jobId: string,
+  applicationData: ApplyForJobPayload
+): Promise<ApplyForJobPayload> => {
+  try {
+    const response = await axios.post(`${BASE_URL}/${jobId}`, applicationData, {
       headers: getAuthHeaders(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      throw error;
     });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
 };
 
 export const downloadCV = (fileId: string) => {

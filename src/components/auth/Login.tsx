@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { message } from "antd";
-import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../contexts/AuthContext";
@@ -15,7 +14,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -23,7 +22,7 @@ const Login: React.FC = () => {
       return;
     }
 
-    const emailError = validateField('email', email); 
+    const emailError = validateField("email", email);
     if (emailError) {
       message.error(emailError);
       return;
@@ -31,38 +30,38 @@ const Login: React.FC = () => {
 
     setLoading(true);
 
-    login(email, password)
-      .then((res) => {
-        setLoading(false);
-        if (res.status === 403) {
-          message.info(res.message);
-          navigate(`/verify-otp?email=${email}&purpose=ACCOUNT_VERIFICATION`);
-        } else if (res.status === 200) {
-          message.success(res.message);
-          navigate("/");
-        } else {
-          message.error(res.message);
-        }
-      })
-      .catch((error: any) => {
-        setLoading(false);
-        message.error(error.message || "Đăng nhập thất bạn, vui lòng thử lại");
-      });
+    try {
+      const res = await login(email, password);
+      setLoading(false);
+
+      if (res.status === 422) {
+        message.info(res.message);
+        navigate(`/verify-otp?email=${email}`);
+      } else if (res.status === 200) {
+        message.success(res.message);
+        navigate("/");
+      } else {
+        message.error(res.message);
+      }
+    } catch (error: any) {
+      setLoading(false);
+      message.error(error.message || "Đăng nhập thất bại, vui lòng thử lại");
+    }
   };
 
   const validateField = (field: string, value: string) => {
     switch (field) {
-      case 'email':
+      case "email":
         if (!value) return "Email không được để trống";
         if (!/\S+@\S+\.\S+/.test(value)) return "Email không hợp lệ";
         return null;
-      case 'password':
+      case "password":
         if (!value) return "Mật khẩu không được để trống";
         return null;
       default:
         return null;
     }
-  };  
+  };
 
   const handleForgotPasword = () => {
     navigate("/forgot-password");
@@ -74,16 +73,16 @@ const Login: React.FC = () => {
       onSubmit={handleSubmit}
     >
       {/* Login with Google button */}
-      <Button variant="light" icon={FcGoogle} className="w-full">
+      {/* <Button variant="light" icon={FcGoogle} className="w-full">
         Đăng nhập với Google
-      </Button>
+      </Button> */}
 
       {/* Divide */}
-      <div className="flex items-center my-3 w-full">
+      {/* <div className="flex items-center my-3 w-full">
         <div className="border-t border-secondary-100 flex-grow"></div>
         <span className="px-2 text-secondary-700">Hoặc</span>
         <div className="border-t border-secondary-100 flex-grow"></div>
-      </div>
+      </div> */}
 
       {/* Email field */}
       <div className="w-full mb-3">
@@ -96,7 +95,7 @@ const Login: React.FC = () => {
           layout="vertical"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          validate={(value) => validateField('email', value)} 
+          validate={(value) => validateField("email", value)}
         />
       </div>
 
@@ -112,17 +111,17 @@ const Login: React.FC = () => {
           layout="vertical"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          validate={(value) => validateField('password', value)}
+          validate={(value) => validateField("password", value)}
         />
 
         {/* Forgot password link */}
-        <Button
+        {/* <Button
           variant="secondary-link"
           alignment="start"
           onClick={handleForgotPasword}
         >
           Quên mật khẩu?
-        </Button>
+        </Button> */}
       </div>
 
       {/* Login button */}

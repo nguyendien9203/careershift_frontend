@@ -29,7 +29,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         {[...MENU_ITEMS, ...PROFILE_LINKS].map((item) => (
           <div key={item.id} className="w-full">
             <Link
-              to={item.path}
+              to={item.path || ""}
               className={`px-2 py-1 w-full flex items-center gap-x-2 ${
                 activeItem === item.id
                   ? "bg-slate-100 text-primary-500"

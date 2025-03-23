@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 
 import "./styles/global.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -10,7 +11,9 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <AuthProvider>
-        <AppRouter />
+        <Router>
+          <AppRouter />
+        </Router>
       </AuthProvider>
     </div>
   );

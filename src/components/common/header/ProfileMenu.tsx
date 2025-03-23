@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import SubMenu from "./SubMenu";
 import { PROFILE_LINKS } from "../../../constants/profileLinks";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface ProfileMenuProps {
   handleLogout: (event: React.MouseEvent) => void;
@@ -9,6 +10,8 @@ interface ProfileMenuProps {
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ handleLogout }) => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
+
+  const { user } = useAuth();
 
   const handleMouseEnter = () => setIsProfileMenuOpen(true);
   const handleMouseLeave = () => setIsProfileMenuOpen(false);
@@ -21,7 +24,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ handleLogout }) => {
     >
       <button className="flex items-center gap-x-2 px-2 py-1 text-black text-sm bg-white hover:bg-slate-100">
         <i className="bi bi-person-circle text-secondary-700 text-xl"></i>
-        <span className="text-black">Nguyen Dien</span>
+        <span className="text-black">{user?.name}</span>
         <i
           className={`bi bi-chevron-down transition-transform duration-300 text-xs ${
             isProfileMenuOpen ? "rotate-180" : ""
@@ -30,7 +33,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ handleLogout }) => {
       </button>
 
       {/* Profile Dropdown */}
-      {isProfileMenuOpen && <SubMenu items={PROFILE_LINKS} handleLogout={handleLogout} />}
+      {isProfileMenuOpen && (
+        <SubMenu items={PROFILE_LINKS} handleLogout={handleLogout} />
+      )}
     </div>
   );
 };

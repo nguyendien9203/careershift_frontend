@@ -11,23 +11,22 @@ import { jwtDecode } from "jwt-decode";
 import {
   login as performLogin,
   verifyAccountOtp as performVerifyAccountOtp,
+  refreshToken as performRefreshToken,
+  logout as performLogout,
 } from "../services/authService";
+import { getMe as fetchUserInfo } from "../services/userService";
 import { User } from "../types/user";
 
 interface AuthContextProps {
   user: User | null;
-  setUserFromToken: () => void;
   login: (email: string, password: string) => Promise<any>;
   verifyAccountOtp: (email: string, otp: string) => Promise<any>;
   logout: () => void;
-  isUserAuthenticated: () => boolean;
+  isUserAuthenticated: () => Promise<boolean>;
 }
 
 interface DecodedToken {
-  sub: string;
-  userId: string;
-  name: string;
-  roles: string[];
+  id: string;
   exp: number;
 }
 
@@ -36,81 +35,103 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const decodeToken = useCallback((token: string) => {
-    const decodedToken: any = jwtDecode(token);
-    setUser({
-      email: decodedToken.sub,
-      id: decodedToken.userId,
-      name: decodedToken.name,
-      roles: decodedToken.roles,
-    });
+  const setUserFromToken = useCallback(async () => {
+    const token = localStorage.getItem("access_token");
+    console.log("Token:", token);
+    if (!token) return;
+
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(token);
+      const userData = await fetchUserInfo(decodedToken.id);
+      setUser(userData);
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin người dùng:", error);
+      logout();
+    }
   }, []);
 
-  const setUserFromToken = useCallback(() => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      decodeToken(token);
+  useEffect(() => {
+    setUserFromToken();
+  }, [setUserFromToken]);
+
+  console.log("User:", user);
+
+  const handleTokenResponse = async (token: string) => {
+    localStorage.setItem("access_token", token);
+    await setUserFromToken();
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await performLogin(email, password);
+      if (res.status === 200) {
+        await handleTokenResponse(res.accessToken);
+      }
+      return res;
+    } catch (error) {
+      console.error("Lỗi khi đăng nhập:", error);
+      throw error;
     }
-  }, [decodeToken]);
-
-  // useEffect(() => {
-  //   setUserFromToken();
-  // }, [setUserFromToken]);
-
-  const login = (email: string, password: string) => {
-    return performLogin(email, password)
-      .then((res) => {
-        if (res.status === 200) {
-          const jwtDecode = res.data.accessToken;
-          localStorage.setItem("access_token", jwtDecode);
-          decodeToken(jwtDecode);
-        }
-        return res;
-      })
-      .catch((error) => {
-        throw error;
-      });
   };
 
-  const verifyAccountOtp = (email: string, otp: string) => {
-    return performVerifyAccountOtp(email, otp)
-      .then((res) => {
-        if (res.status === 200) {
-          const jwtDecode = res.data.accessToken;
-          localStorage.setItem("access_token", jwtDecode);
-          decodeToken(jwtDecode);
-        }
-        return res;
-      })
-      .catch((error) => {
-        throw error;
-      });
+  const verifyAccountOtp = async (email: string, otp: string) => {
+    try {
+      const res = await performVerifyAccountOtp(email, otp);
+      if (res.status === 200) {
+        await handleTokenResponse(res.accessToken);
+      }
+      return res;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem("access_token");
-    setUser(null);
+  const refreshAccessToken = async () => {
+    try {
+      const res = await performRefreshToken();
+      console.log("Refresh Token Response:", res);
+      if (res.status === 200) {
+        await handleTokenResponse(res.accessToken);
+        return true;
+      }
+    } catch (error) {
+      console.error("Refresh token hết hạn hoặc lỗi:", error);
+      logout();
+    }
+    return false;
   };
 
-  const isUserAuthenticated = () => {
+  const isUserAuthenticated = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
       return false;
     }
 
-    const { exp: expiration } = jwtDecode<DecodedToken>(token);
-    if (Date.now() >= expiration * 1000) {
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+      if (Date.now() >= decoded.exp * 1000) {
+        console.log("Token hết hạn, thử refresh...");
+        const refreshed = await refreshAccessToken();
+        return refreshed;
+      }
+      return true;
+    } catch (error) {
+      console.error("Lỗi khi xác thực token:", error);
       logout();
       return false;
     }
-    return true;
+  };
+
+  const logout = async () => {
+    await performLogout();
+    localStorage.removeItem("access_token");
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        setUserFromToken,
         login,
         verifyAccountOtp,
         logout,

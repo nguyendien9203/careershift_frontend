@@ -21,7 +21,7 @@ export interface JobRequest {
   requirements: string;
   benefits: string;
   other: string;
-  level: JobLevel | null;  
+  level: JobLevel | null;
   startDate: string;
   endDate: string;
   status: string;
@@ -30,19 +30,20 @@ export interface JobRequest {
 }
 
 export interface Job {
-  id?: number;
+  _id?: number;
   title: string;
   slug?: string;
-  startDate: string;
-  endDate: string;
-  status: JobStatus;
-  level: JobLevel | null;
-  departments: Department[];
-  locations: Location[];
-  description: string;
-  requirements: string;
-  benefits: string;
-  other: string;
+  startDate?: string;
+  endDate?: string;
+  status?: JobStatus;
+  level?: JobLevel | null;
+  departments?: Department[];
+  locations?: Location[];
+  description?: string;
+  requirements?: string;
+  benefits?: string;
+  other?: string;
   totalApplicants?: number;
   inProgressApplicants?: number;
+  sourceUrl?: string;
 }

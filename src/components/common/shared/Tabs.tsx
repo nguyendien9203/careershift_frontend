@@ -12,9 +12,17 @@ const Tab: React.FC<TabProps> = ({ item, isActive, onClick }) => {
   return (
     <button
       onClick={() => onClick(item.id)}
-      className={`py-2 text-sm focus:outline-none relative ${isActive ? "text-primary-500" : "text-black"}`}
+      className={`py-2 text-sm focus:outline-none relative ${
+        isActive ? "text-primary-500" : "text-black"
+      }`}
     >
-      {item.icon && <i className={`bi ${item.icon} mr-2 ${isActive ? "text-primary-500" : "text-secondary-700"}`}></i>}
+      {item.icon && (
+        <i
+          className={`bi ${item.icon} mr-2 ${
+            isActive ? "text-primary-500" : "text-secondary-700"
+          }`}
+        ></i>
+      )}
       {item.label}
 
       {isActive && (
@@ -30,8 +38,10 @@ interface TabsProps {
   tabContents: Record<string, React.ReactNode>;
 }
 
-const Tabs: React.FC<TabsProps> = ({ defaultActiveKey, tabs, tabContents  }) => {
-  const [activeKey, setActiveKey] = useState<string>(defaultActiveKey || tabs[0]?.id);
+const Tabs: React.FC<TabsProps> = ({ defaultActiveKey, tabs, tabContents }) => {
+  const [activeKey, setActiveKey] = useState<string>(
+    defaultActiveKey || tabs[0]?.id
+  );
 
   const handleTabClick = (id: string) => {
     setActiveKey(id);
@@ -40,7 +50,7 @@ const Tabs: React.FC<TabsProps> = ({ defaultActiveKey, tabs, tabContents  }) => 
   return (
     <div className="w-full">
       {/* Tab Headers */}
-      <div className="flex gap-x-4 relative border-b border-secondary-100 px-4">
+      <div className="flex justify-evenly gap-x-4 relative border-b border-secondary-100 px-4">
         {tabs.map((tab) => (
           <Tab
             key={tab.id}
@@ -52,9 +62,7 @@ const Tabs: React.FC<TabsProps> = ({ defaultActiveKey, tabs, tabContents  }) => 
       </div>
 
       {/* Tab Content */}
-      <div className="p-4">
-        {tabContents[activeKey]}
-      </div>
+      <div className="p-4">{tabContents[activeKey]}</div>
     </div>
   );
 };

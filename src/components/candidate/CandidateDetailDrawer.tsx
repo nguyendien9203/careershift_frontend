@@ -20,10 +20,10 @@ interface CandidateDetailDrawerProps {
   job: Job;
   application: Application;
   onClose: () => void;
-  handleReject: (applicationId: number) => void;
-  handleAccept: (applicationId: number) => void;
-  moveToPreviousApplication: (currentApplicationId: number) => void;
-  moveToNextApplication: (currentApplicationId: number) => void;
+  handleReject: (applicationId: string) => void;
+  handleAccept: (applicationId: string) => void;
+  moveToPreviousApplication: (currentApplicationId: string) => void;
+  moveToNextApplication: (currentApplicationId: string) => void;
 }
 
 const CandidateDetailDrawer: React.FC<CandidateDetailDrawerProps> = ({
@@ -38,14 +38,14 @@ const CandidateDetailDrawer: React.FC<CandidateDetailDrawerProps> = ({
   const [currentStatus, setCurrentStatus] = useState(application.status);
   const translatedStatus = getApplicationStatusLabel(application.status);
 
-  const onReject = (applicationId: number) => {
+  const onReject = (applicationId: string) => {
     handleReject(applicationId);
-    setCurrentStatus(ApplicationStatus.FAILED);
+    setCurrentStatus(ApplicationStatus.REJECTED);
   };
 
-  const onAccept = (applicationId: number) => {
+  const onAccept = (applicationId: string) => {
     handleAccept(applicationId);
-    setCurrentStatus(ApplicationStatus.PASSED);
+    setCurrentStatus(ApplicationStatus.INTERVIEW);
   };
 
   return (
@@ -53,7 +53,7 @@ const CandidateDetailDrawer: React.FC<CandidateDetailDrawerProps> = ({
       <div className="flex items-center justify-between h-8 w-full border-b border-secondary-100">
         <button
           className="flex justify-start items-center border-none bg-white hover:bg-slate-100 text-primary-500 w-[50%] h-full px-4"
-          onClick={() => moveToPreviousApplication(application.id)}
+          onClick={() => moveToPreviousApplication(application._id)}
         >
           <i className="bi bi-arrow-left-circle mr-2"></i>
           <span>Trước</span>
@@ -61,7 +61,7 @@ const CandidateDetailDrawer: React.FC<CandidateDetailDrawerProps> = ({
         <div className="border-l border-secondary-100 h-full"></div>
         <button
           className="flex justify-end items-center border-none bg-white hover:bg-slate-100 text-primary-500 w-[50%] h-full px-4"
-          onClick={() => moveToNextApplication(application.id)}
+          onClick={() => moveToNextApplication(application._id)}
         >
           <span>Sau</span>
           <i className="bi bi-arrow-right-circle ml-2"></i>
@@ -91,20 +91,20 @@ const CandidateDetailDrawer: React.FC<CandidateDetailDrawerProps> = ({
                 icon="bi-three-dots"
                 iconClassName="text-primary-500"
               />
-              {currentStatus === ApplicationStatus.PENDING ? (
+              {currentStatus === ApplicationStatus.ON_PROGRESS ? (
                 <>
                   <Button
                     variant="light"
                     icon="bi-x-circle"
                     iconClassName="text-red-500"
-                    onClick={() => onReject(application.id)}
+                    onClick={() => onReject(application._id)}
                   />
 
                   <Button
                     variant="light"
                     icon="bi-hand-thumbs-up"
                     iconClassName="text-success-500"
-                    onClick={() => onAccept(application.id)}
+                    onClick={() => onAccept(application._id)}
                   >
                     Chấp nhận
                   </Button>

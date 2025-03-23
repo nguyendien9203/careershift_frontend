@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../../contexts/AuthContext";
 import { MENU_ITEMS } from "../../../constants/menuItems";
@@ -14,6 +14,7 @@ const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [activeItem, setActiveItem] = useState<string>("");
   const location = useLocation();
+  const navigate = useNavigate();
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const Header: React.FC = () => {
   const handleLogout = (event: React.MouseEvent) => {
     event.preventDefault();
     logout();
+    navigate("/login");
   };
 
   const handleMenuToggle = () => {

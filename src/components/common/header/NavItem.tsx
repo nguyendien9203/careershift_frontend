@@ -11,7 +11,12 @@ interface NavItemProps {
   handleLogout: (event: React.MouseEvent) => void;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ item, activeItem, handleItemClick, handleLogout }) => {
+const NavItem: React.FC<NavItemProps> = ({
+  item,
+  activeItem,
+  handleItemClick,
+  handleLogout,
+}) => {
   const [isNavItemOpen, setIsNavItemOpen] = useState<boolean>(false);
 
   const handleMouseEnter = () => setIsNavItemOpen(true);
@@ -24,12 +29,12 @@ const NavItem: React.FC<NavItemProps> = ({ item, activeItem, handleItemClick, ha
       onMouseLeave={handleMouseLeave}
     >
       <Link
-        to={item.path}
+        to={item.path || ""}
         onClick={() => handleItemClick(item.id)}
         className={`flex items-center gap-x-2 px-2 py-1 h-ful text-sm ${
-            activeItem === item.id 
-                ? "bg-slate-100 text-primary-500"
-                : "text-black bg-white hover:bg-slate-100"
+          activeItem === item.id
+            ? "bg-slate-100 text-primary-500"
+            : "text-black bg-white hover:bg-slate-100"
         }`}
       >
         {/* Icon */}
@@ -50,10 +55,7 @@ const NavItem: React.FC<NavItemProps> = ({ item, activeItem, handleItemClick, ha
 
       {/* Dropdown for subMenu */}
       {item.subItems.length > 0 && isNavItemOpen && (
-        <SubMenu 
-          items={item.subItems}
-          handleItemClick={handleItemClick}
-        />
+        <SubMenu items={item.subItems} handleItemClick={handleItemClick} />
       )}
     </div>
   );

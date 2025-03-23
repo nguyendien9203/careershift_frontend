@@ -1,10 +1,10 @@
 import axios from "axios";
 
 import { BASE_API_URL, getAuthHeaders } from "../utils/config";
-import { JobLevel } from "../constants/jobLevel";
+// import { JobLevel } from "../constants/jobLevel";
 import { JobStatus } from "../constants/jobStatus";
 
-const BASE_URL = `${BASE_API_URL}/job`;
+const BASE_URL = `${BASE_API_URL}/jobs`;
 
 /**
  * Get a list of jobs with pagination and filters
@@ -17,35 +17,48 @@ const BASE_URL = `${BASE_API_URL}/job`;
  * @param departmentIds - List of department IDs to filter by (optional)
  * @returns Promise resolving to PageResponse<Job>
  */
-export const getJobs = (
-  pageNo: number = 1,
-  pageSize: number = 5,
-  keyword: string = "",
-  levels: JobLevel[] = [],
-  statuses: JobStatus[] = [],
-  locations: string[] = [],
-  departments: string[] = []
-) => {
-  const params: any = {
-    pageNo,
-    pageSize,
-  };
+// export const getJobs = (
+//   pageNo: number = 1,
+//   pageSize: number = 5,
+//   keyword: string = "",
+//   levels: JobLevel[] = [],
+//   statuses: JobStatus[] = [],
+//   locations: string[] = [],
+//   departments: string[] = []
+// ) => {
+//   const params: any = {
+//     pageNo,
+//     pageSize,
+//   };
 
-  if (keyword) params.keyword = keyword;
-  if (levels.length > 0) params.levels = levels.join(",");
-  if (statuses.length > 0) params.statuses = statuses.join(",");
-  if (locations.length > 0) params.locations = locations.join(",");
-  if (departments.length > 0) params.departments = departments.join(",");
+//   if (keyword) params.keyword = keyword;
+//   if (levels.length > 0) params.levels = levels.join(",");
+//   if (statuses.length > 0) params.statuses = statuses.join(",");
+//   if (locations.length > 0) params.locations = locations.join(",");
+//   if (departments.length > 0) params.departments = departments.join(",");
 
-  return axios
-    .get(BASE_URL, {
+//   return axios
+//     .get(BASE_URL, {
+//       headers: getAuthHeaders(),
+//       params,
+//     })
+//     .then((res) => res.data)
+//     .catch((error) => {
+//       throw new Error(error);
+//     });
+// };
+
+export const getJobs = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}`, {
       headers: getAuthHeaders(),
-      params,
-    })
-    .then((res) => res.data)
-    .catch((error) => {
-      throw new Error(error);
     });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Không thể lấy thông tin job"
+    );
+  }
 };
 
 /**
@@ -53,15 +66,17 @@ export const getJobs = (
  * @param id Job ID
  * @returns Promise resolving to JobResponse object
  */
-export const getJobById = (id: number) => {
-  return axios
-    .get(`${BASE_URL}/${id}`, {
+export const getJobById = async (id: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/${id}`, {
       headers: getAuthHeaders(),
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      throw new Error(error);
     });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Không thể lấy thông tin job"
+    );
+  }
 };
 
 /**
@@ -72,7 +87,7 @@ export const getJobById = (id: number) => {
  */
 export const updateJobStatus = (id: number, status: JobStatus) => {
   const requestBody = {
-    status: status
+    status: status,
   };
 
   return axios

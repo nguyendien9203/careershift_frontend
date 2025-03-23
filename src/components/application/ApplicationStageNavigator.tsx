@@ -1,37 +1,40 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
-import Tag from "../common/shared/Tag";
-import { ApplicationStage, STAGE_ITEMS } from "../../constants/applicationStages";
+//import Tag from "../common/shared/Tag";
+import {
+  ApplicationStage,
+  STAGE_ITEMS,
+} from "../../constants/applicationStages";
 import { StageData } from "../../types/application";
 
 interface ApplicationStageNavigatorProps {
-  stages: Map<ApplicationStage, StageData>; 
+  stages: Map<ApplicationStage, StageData>;
   selectedStage: ApplicationStage;
   onStageClick: (stage: ApplicationStage) => void;
-};
+}
 
 const ApplicationStageNavigator: React.FC<ApplicationStageNavigatorProps> = ({
   stages,
-  selectedStage, 
-  onStageClick
+  selectedStage,
+  onStageClick,
 }) => {
-  const [activeStageId, setActiveStageId] = useState<ApplicationStage | null>(selectedStage);
-  const stagesData = useMemo(() => {
-    return STAGE_ITEMS.map((stage) => {
-      const stageData = stages.get(stage.id);
-      return {
-        ...stage,
-        activeCandidates: stageData?.activeCandidates || 0,
-        passedCandidates: stageData?.pendingCandidates || 0,
-      };
-    });
-  }, [stages]);
-
-  console.log("Received stage in ApplicationStageNavigator:", selectedStage);
+  const [activeStageId, setActiveStageId] = useState<ApplicationStage | null>(
+    selectedStage
+  );
+  // const stagesData = useMemo(() => {
+  //   return STAGE_ITEMS.map((stage) => {
+  //     const stageData = stages.get(stage.id);
+  //     return {
+  //       ...stage,
+  //       activeCandidates: stageData?.activeCandidates || 0,
+  //       passedCandidates: stageData?.pendingCandidates || 0,
+  //     };
+  //   });
+  // }, [stages]);
 
   return (
     <div className="h-[80px] flex border border-secondary-100 rounded-t-[5px] bg-white">
-      {stagesData.map((stage, index) => (
+      {STAGE_ITEMS.map((stage, index) => (
         <>
           <div
             key={stage.id}
@@ -49,7 +52,7 @@ const ApplicationStageNavigator: React.FC<ApplicationStageNavigatorProps> = ({
               </span>
               <div className="flex flex-col gap-y-2">
                 <h5 className="text-sm">{stage.label}</h5>
-                <div className="flex items-center gap-x-2">
+                {/* <div className="flex items-center gap-x-2">
                   <Tag
                     label={stage.activeCandidates.toString()}
                     variant="light"
@@ -68,7 +71,7 @@ const ApplicationStageNavigator: React.FC<ApplicationStageNavigatorProps> = ({
                         : "text-black"
                     }
                   />
-                </div>
+                </div> */}
               </div>
             </div>
 

@@ -3,10 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { message } from "antd";
 
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  verifyPasswordResetOtp,
-  resendOtpIfNeeded,
-} from "../../services/authService";
+import { resendOtpIfNeeded } from "../../services/authService";
 import Input from "../common/shared/Input";
 import Button from "../common/shared/Button";
 
@@ -14,9 +11,7 @@ const VerifyOTP: React.FC = () => {
   const navigate = useNavigate();
   const { verifyAccountOtp } = useAuth();
   const { search } = useLocation();
-  const { email = "", purpose = "" } = Object.fromEntries(
-    new URLSearchParams(search)
-  );
+  const { email = "" } = Object.fromEntries(new URLSearchParams(search));
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,7 +43,7 @@ const VerifyOTP: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.some((digit) => digit === "")) {
       message.error("Vui lòng nhập đầy đủ mã OTP");
@@ -58,48 +53,31 @@ const VerifyOTP: React.FC = () => {
     setLoading(true);
 
     const otpString = otp.join("");
+    try {
+      const res = await verifyAccountOtp(email, otpString);
+      setLoading(false);
 
-    if (purpose === "ACCOUNT_VERIFICATION") {
-      verifyAccountOtp(email, otpString)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200) {
-            message.success(res.message);
-            navigate("/");
-          }
-        })
-        .catch((error: any) => {
-          setLoading(false);
-          message.error(error.message || "Xác minh thất bại");
-        });
-    } else {
-      verifyPasswordResetOtp(email, otpString)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200) {
-            message.success(res.message);
-            navigate(`/reset-password?email=${email}`);
-          }
-        })
-        .catch((error: any) => {
-          setLoading(false);
-          message.error(error.message || "Xác minh thất bại");
-        });
+      if (res.status === 200) {
+        message.success(res.message);
+        navigate("/");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      message.error(error.message || "Xác minh thất bại");
     }
   };
 
-  const handleResentOtp = () => {
+  const handleResentOtp = async () => {
     setIsResendingOtp(true);
 
-    resendOtpIfNeeded(email, purpose)
-      .then((res) => {
-        setIsResendingOtp(false);
-        message.success(res.message);
-      })
-      .catch((error) => {
-        setIsResendingOtp(false);
-        message.error(error.message || "Gửi lại mã OTP thất bại");
-      });
+    try {
+      const res = await resendOtpIfNeeded(email);
+      setIsResendingOtp(false);
+      message.success(res.message);
+    } catch (error: any) {
+      setIsResendingOtp(false);
+      message.error(error.message || "Gửi lại mã OTP thất bại");
+    }
   };
 
   const handleBack = () => {

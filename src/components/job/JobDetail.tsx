@@ -10,19 +10,29 @@ import ApplicationStageNavigator from "../application/ApplicationStageNavigator"
 import SearchBar from "../common/shared/SearchBar";
 import ApplicationTable from "../application/ApplicationTable";
 import DropdownMenu from "../common/shared/DropdownMenu";
-import { getJobLevelLabel } from "../../constants/jobLevel";
-import { getJobById, updateJobStatus } from "../../services/jobServices";
+//import { getJobLevelLabel } from "../../constants/jobLevel";
+import { getJobById } from "../../services/jobServices";
 import { Job } from "../../types/job";
 import { JobStatus } from "../../constants/jobStatus";
 import { ApplicationStage } from "../../constants/applicationStages";
-import { Application, StageData } from "../../types/application";
+import {
+  Application,
+  ApplyForJobPayload,
+  ApplyForJobRequest,
+  StageData,
+} from "../../types/application";
 import {
   ApplicationStatus,
   applicationStatusOptions,
 } from "../../constants/applicationStatus";
 import { SubItem } from "../../types/item";
-import { getApplicationsByStage } from "../../services/applicationService";
+import {
+  getApplicationsByStage,
+  uploadCandidateCV,
+  applyForJob,
+} from "../../services/applicationService";
 import { PageResponse } from "../../types/page";
+import AddRecruitmentDrawer from "../application/AddRecruitmentDrawer";
 
 const JobDetail: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +40,7 @@ const JobDetail: React.FC = () => {
   const { id } = location.state || {};
 
   const [job, setJob] = useState<Job | null>(null);
-  const [isPublicJob, setIsPublicJob] = useState<boolean>(false);
+  //const [isPublicJob, setIsPublicJob] = useState<boolean>(false);
   const [selectedStage, setSelectedStage] = useState<ApplicationStage>(
     ApplicationStage.SCREENING
   );
@@ -38,79 +48,70 @@ const JobDetail: React.FC = () => {
     new Map()
   );
   const [applications, setApplications] = useState<Application[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  //const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedStatuses, setSelectedStatuses] = useState<ApplicationStatus[]>(
     []
   );
+  const [isRecruitmentDrawerOpen, setIsRecruitmentDrawerOpen] = useState(false);
 
   // Pagination states
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-  const [totalRows, setTotalRows] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
+  // const [currentPage, setCurrentPage] = useState<number>(1);
+  // const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  // const [totalRows, setTotalRows] = useState<number>(0);
+  // const [totalPages, setTotalPages] = useState<number>(0);
 
-  useEffect(() => {
-    if (id) {
-      getJobById(id)
-        .then((res) => {
-          const fetchedJob = res.data;
-          setJob(fetchedJob);
-          setIsPublicJob(fetchedJob.status === JobStatus.OPEN);
-        })
-        .catch((error: any) => {
-          message.error(error.message || " Không thể tải công việc");
-        });
+  const getJobDetails = useCallback(async () => {
+    try {
+      const res = await getJobById(id);
+      const fetchedJob = res.data;
+      setJob(fetchedJob);
+    } catch (error: any) {
+      message.error(error.message || " Không thể tải công việc");
     }
   }, [id]);
+
+  useEffect(() => {
+    getJobDetails();
+  }, [getJobDetails]);
 
   const fetchApplications = useCallback(async () => {
     try {
       const res = await getApplicationsByStage(
-        currentPage,
-        rowsPerPage,
-        searchQuery,
-        selectedStatuses,
-        selectedStage,
+        // currentPage,
+        // rowsPerPage,
+        // searchQuery,
+        // selectedStatuses,
+        // selectedStage,
         id
       );
-      if (res.status === 200) {
-        const stagesData: Map<ApplicationStage, StageData> = new Map(
-          Object.entries(res.data.stages).map(([key, value]) => [
-            key as ApplicationStage,
-            value as StageData,
-          ])
-        );
-        setStages(stagesData);
+      const stagesData: Map<ApplicationStage, StageData> = new Map(
+        Object.entries(res).map(([key, value]) => [
+          key as ApplicationStage,
+          value as StageData,
+        ])
+      );
+      setStages(stagesData);
 
-        const currentStageData = stagesData.get(selectedStage);
+      const currentStageData = stagesData.get(selectedStage);
 
-        if (currentStageData?.applications) {
-          const {
-            currentPage,
-            totalPages,
-            totalElements,
-            data,
-          }: PageResponse<Application> = currentStageData.applications;
-          setApplications(data);
-          setCurrentPage(currentPage);
-          setTotalPages(totalPages);
-          setTotalRows(totalElements);
-        }
+      if (Array.isArray(currentStageData)) {
+        setApplications(currentStageData);
+      } else {
+        setApplications([]);
       }
     } catch (error: any) {
       message.error(error.message || "không thể tải dữ liệu thành công");
     }
   }, [
-    currentPage,
-    rowsPerPage,
-    searchQuery,
-    selectedStatuses,
+    // currentPage,
+    // rowsPerPage,
+    // searchQuery,
+    // selectedStatuses,
     selectedStage,
     id,
   ]);
 
   useEffect(() => {
-    console.log("Fetching applications for stage:", selectedStage);
     fetchApplications();
   }, [fetchApplications, selectedStage]);
 
@@ -120,79 +121,106 @@ const JobDetail: React.FC = () => {
     return <div>Không tìm thấy công việc này</div>;
   }
 
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
+  // const handleSearchChange = (query: string) => {
+  //   setSearchQuery(query);
+  // };
 
-  const handleApplicationStatusChange = (
-    status: ApplicationStatus,
-    checked: boolean
-  ) => {
-    setSelectedStatuses((prev) =>
-      checked ? [...prev, status] : prev.filter((s) => s !== status)
-    );
-  };
+  // const handleApplicationStatusChange = (
+  //   status: ApplicationStatus,
+  //   checked: boolean
+  // ) => {
+  //   setSelectedStatuses((prev) =>
+  //     checked ? [...prev, status] : prev.filter((s) => s !== status)
+  //   );
+  // };
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-  };
+  // const handlePageChange = (newPage: number) => {
+  //   setCurrentPage(newPage);
+  // };
 
-  const handleRowsPerPageChange = (rowsPerPage: number) => {
-    setRowsPerPage(rowsPerPage);
-    setCurrentPage(1);
-  };
+  // const handleRowsPerPageChange = (rowsPerPage: number) => {
+  //   setRowsPerPage(rowsPerPage);
+  //   setCurrentPage(1);
+  // };
 
-  const handleJobStatusChange = (checked: boolean) => {
-    if (job) {
-      const updatedStatus = checked ? JobStatus.OPEN : JobStatus.DRAFT;
-      setIsPublicJob(checked);
-      updateJobStatus(job.id ?? 0, updatedStatus)
-        .then(() => {
-          setJob({ ...job, status: updatedStatus });
-        })
-        .catch((error: any) => {
-          message.error(
-            error.message || "Không thể cập nhật trạng thái công việc"
-          );
-          setIsPublicJob(!checked);
-        });
-    }
-  };
+  // const handleJobStatusChange = (checked: boolean) => {
+  //   if (job) {
+  //     const updatedStatus = checked ? JobStatus.OPEN : JobStatus.DRAFT;
+  //     setIsPublicJob(checked);
+  //     updateJobStatus(job._id ?? 0, updatedStatus)
+  //       .then(() => {
+  //         setJob({ ...job, status: updatedStatus });
+  //       })
+  //       .catch((error: any) => {
+  //         message.error(
+  //           error.message || "Không thể cập nhật trạng thái công việc"
+  //         );
+  //         setIsPublicJob(!checked);
+  //       });
+  //   }
+  // };
 
   const handleStageClick = (stage: ApplicationStage) => {
     setSelectedStage(stage);
   };
 
-  const statusItems: SubItem[] = applicationStatusOptions.map((status) => ({
-    id: status.value,
-    label: status.label,
-    isCheckbox: true,
-    checked: selectedStatuses.includes(status.value),
-    onChange: (checked) => handleApplicationStatusChange(status.value, checked),
-  }));
+  const handleRecruitmentSubmit = async (formData: ApplyForJobRequest) => {
+    try {
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      data.append("source", formData.source);
+
+      if (formData.cvFile) {
+        data.append("cvFile", formData.cvFile);
+      }
+
+      data.append("notes", formData.notes);
+
+      const uploadResponse = await uploadCandidateCV(id, formData);
+      console.log(uploadResponse);
+      if (uploadResponse.continued) {
+        const applyResponse = await applyForJob(id, uploadResponse);
+        console.log(applyResponse);
+        message.success("Ứng tuyển thành công");
+      }
+    } catch (error: any) {
+      message.error(error.message || "Lỗi tuyển dụng");
+    }
+    setIsRecruitmentDrawerOpen(false);
+  };
+
+  // const statusItems: SubItem[] = applicationStatusOptions.map((status) => ({
+  //   id: status.value,
+  //   label: status.label,
+  //   isCheckbox: true,
+  //   checked: selectedStatuses.includes(status.value),
+  //   onChange: (checked) => handleApplicationStatusChange(status.value, checked),
+  // }));
 
   return (
     <div>
       <AppBarLayout
         title={job.title}
-        subtitle={
-          <div className="flex items-center flex-wrap gap-x-2">
-            <Tag label={`Tổng: ${job.totalApplicants}`} variant="light" />
-            <Tag
-              label={`Đang tiến hành: ${job.inProgressApplicants}`}
-              variant="light"
-            />
-            <Tag label={`${getJobLevelLabel(job.level)}`} variant="light" />
-            {job.locations.map((loc) => (
-              <Tag
-                key={loc.id}
-                label={loc.name}
-                icon="bi-geo"
-                variant="success"
-              />
-            ))}
-          </div>
-        }
+        // subtitle={
+        //   <div className="flex items-center flex-wrap gap-x-2">
+        //     <Tag label={`Tổng: ${job.totalApplicants}`} variant="light" />
+        //     <Tag
+        //       label={`Đang tiến hành: ${job.inProgressApplicants}`}
+        //       variant="light"
+        //     />
+        //     <Tag label={`${getJobLevelLabel(job.level)}`} variant="light" />
+        //     {job.locations.map((loc) => (
+        //       <Tag
+        //         key={loc.id}
+        //         label={loc.name}
+        //         icon="bi-geo"
+        //         variant="success"
+        //       />
+        //     ))}
+        //   </div>
+        // }
         actions={[
           <div className="flex items-center gap-x-2">
             <Button
@@ -210,12 +238,13 @@ const JobDetail: React.FC = () => {
 
             <Button
               variant="light"
-              icon="bi-eye"
+              icon="bi-person-add"
               iconClassName="text-primary-500"
+              onClick={() => setIsRecruitmentDrawerOpen(true)}
             >
-              Xem
+              Thêm ứng tuyển
             </Button>
-            <div
+            {/* <div
               className={`flex items-center gap-x-2 border rounded-[5px] h-8 px-2 w-auto ${
                 isPublicJob ? "border-primary-500" : "border-secondary-100"
               }`}
@@ -233,7 +262,7 @@ const JobDetail: React.FC = () => {
               >
                 {isPublicJob ? "Công khai" : "Riêng tư"}
               </span>
-            </div>
+            </div> */}
           </div>,
         ]}
         onBack={() => navigate(-1)}
@@ -241,7 +270,7 @@ const JobDetail: React.FC = () => {
       />
 
       <PageContentLayout
-        coloumLayout="full"
+        columnLayout="full"
         content={
           <div>
             <ApplicationStageNavigator
@@ -249,8 +278,7 @@ const JobDetail: React.FC = () => {
               selectedStage={selectedStage}
               onStageClick={handleStageClick}
             />
-            <div className="p-2 border-x border-secondary-100 flex items-center justify-between">
-              <p>5 ứng viên đang chờ vòng tiếp theo</p>
+            {/* <div className="p-2 border-x border-secondary-100 flex items-center justify-between">
               <div className="w-1/4 flex items-center gap-x-2">
                 <DropdownMenu
                   icon="bi-funnel"
@@ -265,21 +293,31 @@ const JobDetail: React.FC = () => {
                   placeholder="Tìm kiếm ứng viên..."
                 />
               </div>
-            </div>
+            </div> */}
             <ApplicationTable
               job={job}
-              totalPages={totalPages}
-              totalRows={totalRows}
-              rowsPerPage={rowsPerPage}
-              currentPage={currentPage}
+              // totalPages={totalPages}
+              // totalRows={totalRows}
+              // rowsPerPage={rowsPerPage}
+              // currentPage={currentPage}
               applications={applications}
-              handlePageChange={handlePageChange}
-              handleRowsPerPageChange={handleRowsPerPageChange}
+              // handlePageChange={handlePageChange}
+              // handleRowsPerPageChange={handleRowsPerPageChange}
               reloadApplications={fetchApplications}
             />
           </div>
         }
       />
+
+      {/* Recruitment Drawer */}
+      {isRecruitmentDrawerOpen && (
+        <AddRecruitmentDrawer
+          isOpen={isRecruitmentDrawerOpen}
+          onClose={() => setIsRecruitmentDrawerOpen(false)}
+          onSubmit={handleRecruitmentSubmit}
+          reloadApplications={fetchApplications}
+        />
+      )}
     </div>
   );
 };

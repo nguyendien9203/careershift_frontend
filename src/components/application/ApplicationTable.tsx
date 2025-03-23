@@ -13,11 +13,9 @@ import {
 import { Application } from "../../types/application";
 import CandidateDetailDrawer from "../candidate/CandidateDetailDrawer";
 import { Job } from "../../types/job";
-import {
-  rejectApplication,
-  acceptApplication,
-} from "../../services/applicationService";
+import { updateRecruitmentStatus } from "../../services/applicationService";
 import { message } from "antd";
+import AddRecruitmentDrawer from "./AddRecruitmentDrawer";
 
 const columns: Column[] = [
   {
@@ -41,12 +39,12 @@ const columns: Column[] = [
 interface ApplicationTableProps {
   job: Job;
   applications: Application[];
-  totalPages: number;
-  totalRows: number;
-  rowsPerPage: number;
-  currentPage: number;
-  handlePageChange: (page: number) => void;
-  handleRowsPerPageChange: (rowsPage: number) => void;
+  totalPages?: number;
+  totalRows?: number;
+  rowsPerPage?: number;
+  currentPage?: number;
+  handlePageChange?: (page: number) => void;
+  handleRowsPerPageChange?: (rowsPage: number) => void;
   reloadApplications: () => void;
 }
 
@@ -63,49 +61,57 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
 }) => {
   const [selectedApplication, setSelectedApplication] =
     useState<Application | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCandidateDetailDrawerOpen, setIsCandidateDetailDrawerOpen] =
+    useState(false);
 
   const handleViewDetails = (application: Application) => {
     setSelectedApplication(application);
-    setIsDrawerOpen(true);
+    setIsCandidateDetailDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
     setSelectedApplication(null);
-    setIsDrawerOpen(false);
+    setIsCandidateDetailDrawerOpen(false);
   };
 
-  const handleReject = (applicationId: number) => {
-    rejectApplication(applicationId)
-      .then((res) => {
-        if (res.status === 200) {
-          message.success(res.message);
-          reloadApplications();
-        }
-      })
-      .catch((error) => {
-        message.error(error.message || "Lỗi từ chối ứng tuyển");
-      });
+  const handleReject = async (applicationId: string) => {
+    try {
+      const res = await updateRecruitmentStatus(
+        applicationId,
+        ApplicationStatus.REJECTED
+      );
+      if (res.status === 200) {
+        message.success(res.message);
+        reloadApplications();
+        moveToNextApplication(applicationId);
+      }
+    } catch (error: any) {
+      message.error(error.message || "Lỗi từ chối ứng tuyển");
+    }
   };
 
-  const handleAccept = (applicationId: number) => {
-    acceptApplication(applicationId)
-      .then((res) => {
-        if (res.status === 200) {
-          message.success(res.message);
-          reloadApplications();
-          moveToNextApplication(applicationId);
-        }
-      })
-      .catch((error) => {
-        message.error(error.message || "Lỗi chấp nhận ứng tuyển");
-      });
+  const handleAccept = async (applicationId: string) => {
+    try {
+      const res = await updateRecruitmentStatus(
+        applicationId,
+        ApplicationStatus.INTERVIEW
+      );
+      if (res.status === 200) {
+        message.success(res.message);
+        reloadApplications();
+        moveToNextApplication(applicationId);
+      }
+    } catch (error: any) {
+      message.error(error.message || "Lỗi chấp nhận ứng tuyển");
+    }
   };
 
-  const moveToPreviousApplication = (currentApplicationId: number) => {
-    const currentIndex = applications.findIndex((app) => app.id === currentApplicationId);
+  const moveToPreviousApplication = (currentApplicationId: string) => {
+    const currentIndex = applications.findIndex(
+      (app) => app._id === currentApplicationId
+    );
     const prevIndex = currentIndex - 1;
-  
+
     if (prevIndex >= 0) {
       setSelectedApplication(applications[prevIndex]);
     } else {
@@ -113,13 +119,13 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
     }
   };
 
-  const moveToNextApplication = (currentApplicationId: number) => {
+  const moveToNextApplication = (currentApplicationId: string) => {
     const currentIndex = applications.findIndex(
-      (app) => app.id === currentApplicationId
+      (app) => app._id === currentApplicationId
     );
-  
+
     const nextIndex = currentIndex + 1;
-  
+
     if (nextIndex < applications.length) {
       setSelectedApplication(applications[nextIndex]);
     } else {
@@ -127,11 +133,10 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
       handleCloseDrawer();
     }
   };
-  
 
   const data = applications.map((application) => {
     const translatedStatus = getApplicationStatusLabel(application.status);
-    const isFailed = application.status === ApplicationStatus.FAILED;
+    const isFailed = application.status === ApplicationStatus.REJECTED;
 
     return {
       ...application.candidate,
@@ -149,7 +154,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
             size="small"
             icon="bi-x-circle"
             iconClassName="text-red-500"
-            onClick={() => handleReject(application.id)}
+            onClick={() => handleReject(application._id)}
           >
             Từ chối
           </Button>
@@ -159,7 +164,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
             size="small"
             icon="bi-hand-thumbs-up"
             iconClassName="text-success-500"
-            onClick={() => handleAccept(application.id)}
+            onClick={() => handleAccept(application._id)}
           >
             Chấp nhận
           </Button>
@@ -193,18 +198,18 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
         <Table
           columns={columns}
           data={data}
-          totalPages={totalPages || 1}
-          totalRows={totalRows || 0}
-          rowsPerPageOptions={[5, 10, 15]}
-          rowsPerPage={rowsPerPage || 5}
-          currentPage={currentPage || 1}
-          handlePageChange={handlePageChange}
-          handleRowsPerPageChange={handleRowsPerPageChange}
+          // totalPages={totalPages || 1}
+          // totalRows={totalRows || 0}
+          // rowsPerPageOptions={[5, 10, 15]}
+          // rowsPerPage={rowsPerPage || 5}
+          // currentPage={currentPage || 1}
+          // handlePageChange={handlePageChange}
+          // handleRowsPerPageChange={handleRowsPerPageChange}
         />
       )}
 
       {/* Candidate Detail Drawer */}
-      {isDrawerOpen && selectedApplication && (
+      {isCandidateDetailDrawerOpen && selectedApplication && (
         <CandidateDetailDrawer
           job={job}
           application={selectedApplication}

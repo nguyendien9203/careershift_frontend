@@ -17,3 +17,17 @@ export const CANDIDATE_DETAIL_TABS: SubItem[] = [
   },
 ];
 
+export const USER_ROLE_TABS: SubItem[] = [
+  {
+    id: "user_role",
+    label: "Người dùng",
+    path: "/user-role",
+    permission: "view_user_role",
+  },
+  {
+    id: "role_permission",
+    label: "Quyền",
+    path: "/role-permission",
+    permission: "view_permission",
+  },
+];

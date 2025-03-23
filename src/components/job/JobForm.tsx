@@ -34,13 +34,14 @@ const JobForm: React.FC = () => {
 
   //const [loading, setLoading] = useState<boolean>(false);
 
-  const handleInputChange = (field: string, value: string | JobStatus | JobLevel |  Department[] | Location[]) => {
-    
-      setFormData((prevData) => ({
-        ...prevData,
-        [field]: value,
-      }));
-    
+  const handleInputChange = (
+    field: string,
+    value: string | JobStatus | JobLevel | Department[] | Location[]
+  ) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,14 +49,14 @@ const JobForm: React.FC = () => {
 
     const validationErrors = [
       { field: "title", value: formData.title },
-      { field: "description", value: formData.description },
-      { field: "requirements", value: formData.requirements },
-      { field: "benefits", value: formData.benefits },
-      { field: "startDate", value: formData.startDate },
-      { field: "endDate", value: formData.endDate },
-      { field: "level", value: formData.level },
-      { field: "department", value: formData.departments },
-      { field: "location", value: formData.locations },
+      // { field: "description", value: formData.description },
+      // { field: "requirements", value: formData.requirements },
+      // { field: "benefits", value: formData.benefits },
+      // { field: "startDate", value: formData.startDate },
+      // { field: "endDate", value: formData.endDate },
+      // { field: "level", value: formData.level },
+      // { field: "department", value: formData.departments },
+      // { field: "location", value: formData.locations },
     ]
       .map(({ field, value }) =>
         validateField(field, value, formData.startDate, formData.endDate)
@@ -73,7 +74,7 @@ const JobForm: React.FC = () => {
 
   const validateField = (
     field: string,
-    value: string | JobStatus | JobLevel |  Department[] | Location[] | null,
+    value: string | JobStatus | JobLevel | Department[] | Location[],
     startDate?: string,
     endDate?: string
   ): string | null => {
@@ -81,42 +82,47 @@ const JobForm: React.FC = () => {
       case "title":
         if (!value) return "Tiêu đề không được để trống";
         return null;
-      case "description":
-        if (!value) return "Mô tả công việc không được để trống";
+      case "sourceUrl":
+        if (!value) return "Link nguồn không được đề trống";
         return null;
-      case "requirements":
-        if (!value) return "Yêu cầu ứng viên không được để trống";
-        return null;
-      case "benefits":
-        if (!value) return "Quyền lợi không được để trống";
-        return null;
-      case "startDate":
-        if (!value) return "Ngày bắt đầu không được để trống";
-        if (Array.isArray(value)) {
-          return "Ngày bắt đầu không hợp lệ";
-        }
-        if (endDate && new Date(value) > new Date(endDate)) {
-          return "Ngày bắt đầu không được lớn hơn ngày kết thúc";
-        }
-        return null;
-      case "endDate":
-        if (!value) return "Ngày kết thúc không được để trống";
-        if (Array.isArray(value)) {
-          return "Ngày kết thúc không hợp lệ";
-        }
-        if (startDate && new Date(value) < new Date(startDate)) {
-          return "Ngày kết thúc không được nhỏ hơn ngày bắt đầu";
-        }
-        return null;
-      case "level":
-        if (!value) return "Cấp bậc không được để trống";
-        return null;
-      case "departments":
-        if (Array.isArray(value) && !value.length) return "Ban bộ phận không được để trống";
-        return null;
-      case "locations":
-        if (Array.isArray(value) && !value.length) return "Vị trí làm việc không được để trống";
-        return null;
+      // case "description":
+      //   if (!value) return "Mô tả công việc không được để trống";
+      //   return null;
+      // case "requirements":
+      //   if (!value) return "Yêu cầu ứng viên không được để trống";
+      //   return null;
+      // case "benefits":
+      //   if (!value) return "Quyền lợi không được để trống";
+      //   return null;
+      // case "startDate":
+      //   if (!value) return "Ngày bắt đầu không được để trống";
+      //   if (Array.isArray(value)) {
+      //     return "Ngày bắt đầu không hợp lệ";
+      //   }
+      //   if (endDate && new Date(value) > new Date(endDate)) {
+      //     return "Ngày bắt đầu không được lớn hơn ngày kết thúc";
+      //   }
+      //   return null;
+      // case "endDate":
+      //   if (!value) return "Ngày kết thúc không được để trống";
+      //   if (Array.isArray(value)) {
+      //     return "Ngày kết thúc không hợp lệ";
+      //   }
+      //   if (startDate && new Date(value) < new Date(startDate)) {
+      //     return "Ngày kết thúc không được nhỏ hơn ngày bắt đầu";
+      //   }
+      //   return null;
+      // case "level":
+      //   if (!value) return "Cấp bậc không được để trống";
+      //   return null;
+      // case "departments":
+      //   if (Array.isArray(value) && !value.length)
+      //     return "Ban bộ phận không được để trống";
+      //   return null;
+      // case "locations":
+      //   if (Array.isArray(value) && !value.length)
+      //     return "Vị trí làm việc không được để trống";
+      //   return null;
       default:
         return null;
     }
@@ -131,7 +137,7 @@ const JobForm: React.FC = () => {
       />
 
       <PageContentLayout
-        coloumLayout="6-4"
+        columnLayout="6-4"
         aside={
           <Panel title="Thông tin chung">
             {/* Level */}
@@ -143,7 +149,9 @@ const JobForm: React.FC = () => {
                 layout="vertical"
                 isClose
                 value={formData.level || undefined}
-                onChange={(value) => handleInputChange("level", value as JobLevel)}
+                onChange={(value) =>
+                  handleInputChange("level", value as JobLevel)
+                }
                 validate={(value) => validateField("level", value as JobLevel)}
               />
             </div>

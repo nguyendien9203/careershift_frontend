@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 
-import Pagination from "./Pagination";
+//import Pagination from "./Pagination";
 import Checkbox from "./Checkbox";
 import { Column } from "../../../types/column";
 
 interface TableProps {
   columns: Column[];
   data: { [key: string]: any }[];
-  totalPages: number;
-  totalRows: number;
-  rowsPerPageOptions: number[];
-  rowsPerPage: number;
-  currentPage: number;
-  handlePageChange: (page: number) => void;
+  totalPages?: number;
+  totalRows?: number;
+  rowsPerPageOptions?: number[];
+  rowsPerPage?: number;
+  currentPage?: number;
+  handlePageChange?: (page: number) => void;
   handleRowsPerPageChange?: (rowsPage: number) => void;
   selectedRows?: number;
 }
@@ -49,9 +49,7 @@ const Table: React.FC<TableProps> = ({
     }
   };
 
-  const isAllSelected = data.every((row) =>
-    selectedRows.has(row.id)
-  );
+  const isAllSelected = data.every((row) => selectedRows.has(row.id));
 
   return (
     <div>
@@ -76,7 +74,7 @@ const Table: React.FC<TableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((row,) => (
+            {data.map((row) => (
               <tr
                 key={row.id}
                 className="border-b border-secondary-100 hover:bg-slate-100 text-left"
@@ -102,7 +100,7 @@ const Table: React.FC<TableProps> = ({
       </div>
 
       {/* Pagination controls */}
-      <Pagination
+      {/* <Pagination
         totalPages={totalPages}
         totalRows={totalRows}
         rowsPerPageOptions={rowsPerPageOptions}
@@ -111,7 +109,7 @@ const Table: React.FC<TableProps> = ({
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
         selectedRows={selectedRows.size}
-      />
+      /> */}
     </div>
   );
 };

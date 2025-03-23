@@ -12,7 +12,7 @@ export interface SubItem {
 
 export interface Item {
   id: string;
-  path: string;
+  path?: string;
   label: string;
   icon?: string;
   permission?: string;
