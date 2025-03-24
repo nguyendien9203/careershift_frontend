@@ -11,9 +11,16 @@ import DashboardPage from "../pages/dashboard/DashboardPage";
 import JobListPage from "../pages/job/JobListPage";
 import JobDetailPage from "../pages/job/JobDetailPage";
 import JobAddPage from "../pages/job/JobAddPage";
+
 import TeamMemberPage from "../pages/setting/TeamMemberPage";
 import ProfilePage from "../pages/setting/ProfilePage";
 import ChangePasswordPage from "../pages/setting/ChangePasswordPage";
+
+import InterviewSchedule from "../pages/interview/InterviewSchedule";
+import ConductInterview from "../pages/interview/ConductInterview";
+import UserSchedule from "../pages/interview/UserSchedule"; // Đã import trước đó
+import Offer from "../pages/Offer/OfferSalary"; // Đã import trước đó
+import StatusOffer from "../pages/Offer/StatusOffer"; // Đã import trước đó
 
 const AppRoutes: React.FC = () => {
   return (
@@ -55,6 +62,48 @@ const AppRoutes: React.FC = () => {
           element={
             <PrivateRoute>
               <JobAddPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/interview/schedule"
+          element={
+            <PrivateRoute>
+              <InterviewSchedule />
+            </PrivateRoute>
+          }
+        />{" "}
+        {/* Thêm route */}
+        <Route
+          path="/interview/conduct"
+          element={
+            <PrivateRoute>
+              <ConductInterview />
+            </PrivateRoute>
+          }
+        />{" "}
+        {/* Thêm route */}
+        <Route
+          path="/interview/user-schedule"
+          element={
+            <PrivateRoute>
+              <UserSchedule />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/offersalary"
+          element={
+            <PrivateRoute>
+              <Offer />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/offerstatus"
+          element={
+            <PrivateRoute>
+              <StatusOffer />
             </PrivateRoute>
           }
         />
